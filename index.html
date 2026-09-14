@@ -4,91 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreamHub - Live TV Channels</title>
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-tv"></i>
-                <span>StreamHub</span>
-            </div>
-            <nav class="nav">
-                <a href="#" class="nav-link active" data-category="all">All Channels</a>
-                <a href="#" class="nav-link" data-category="sports">Sports</a>
-                <a href="#" class="nav-link" data-category="news">News</a>
-                <a href="#" class="nav-link" data-category="entertainment">Entertainment</a>
-                <a href="#" class="nav-link" data-category="movies">Movies</a>
-                <a href="#" class="nav-link" data-category="music">Music</a>
-            </nav>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search channels...">
-            </div>
-        </div>
-    </header>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Video Player Section -->
-            <div class="player-section" id="playerSection" style="display: none;">
-                <div class="player-container">
-                    <button class="close-player" id="closePlayer">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="player-header">
-                        <h2 id="currentChannelName">Channel Name</h2>
-                        <p id="currentChannelDesc">Channel Description</p>
-                        <span class="stream-type-badge" id="streamTypeBadge"></span>
-                    </div>
-                    
-                    <!-- Video Player for M3U8, MP4 -->
-                    <video id="videoPlayer" controls autoplay style="display: none;"></video>
-                    
-                    <!-- YouTube Player -->
-                    <div id="youtubePlayer" style="display: none;"></div>
-                    
-                    <!-- Embed Player -->
-                    <iframe id="embedPlayer" style="display: none;" allowfullscreen></iframe>
-                    
-                    <div class="player-controls">
-                        <button class="control-btn" id="prevChannel">
-                            <i class="fas fa-backward"></i> Previous
-                        </button>
-                        <button class="control-btn" id="nextChannel">
-                            Next <i class="fas fa-forward"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+        :root {
+            --primary-color: #6C5CE7;
+            --secondary-color: #A29BFE;
+            --dark-bg: #2D3436;
+            --darker-bg: #1E272E;
+            --text-light: #DFE6E9;
+            --text-dark: #2D3436;
+            --success: #00B894;
+            --danger: #FF7675;
+            --warning: #FDCB6E;
+        }
 
-            <!-- Channels Grid -->
-            <div class="channels-section">
-                <h1 class="section-title">Live TV Channels</h1>
-                <div class="channels-grid" id="channelsGrid">
-                    <!-- Channels will be loaded here dynamically -->
-                </div>
-            </div>
-        </div>
-    </main>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            min-height: 100vh;
+            color: var(--text-light);
+        }
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 StreamHub. All rights reserved.</p>
-            <a href="login.html" class="admin-link">
-                <i class="fas fa-lock"></i> Admin Login
-            </a>
-        </div>
-    </footer>
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
 
-    <!-- HLS.js Library for M3U8 Support -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="js/app.js"></script>
-</body>
-</html>
+        /* Header */
+        .header {
+            background: rgba(45, 52, 54, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            min-width: 250px;
+        }
+
+        .search-box i {
+            margin-right: 10px;
+            color: var(--text-light);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-light);
+            width: 100%;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            
