@@ -1,5 +1,56 @@
-// Initialize channels array from localStorage or use default
-let channels = JSON.parse(localStorage.getItem('channels')) || [];
+// Initialize channels array from localStorage or use default channels
+let channels = JSON.parse(localStorage.getItem('channels')) || [
+    {
+        id: 1,
+        name: "BBC News Live",
+        url: "https://d2vnbkvjbims7j.cloudfront.net/containerA/LTN/playlist.m3u8",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/320px-BBC_News_2019.svg.png",
+        category: "news",
+        description: "24/7 Breaking News Coverage",
+        streamType: "m3u8",
+        active: true
+    },
+    {
+        id: 2,
+        name: "NASA TV",
+        url: "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/200px-NASA_logo.svg.png",
+        category: "documentary",
+        description: "NASA's Official Live Stream",
+        streamType: "m3u8",
+        active: true
+    },
+    {
+        id: 3,
+        name: "Red Bull TV",
+        url: "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+        logo: "https://i.imgur.com/7GackIk.png",
+        category: "sports",
+        description: "Extreme Sports & Entertainment",
+        streamType: "m3u8",
+        active: true
+    },
+    {
+        id: 4,
+        name: "Al Jazeera English",
+        url: "https://live-hls-web-aje.getaj.net/AJE/index.m3u8",
+        logo: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Aljazeera_eng.svg/240px-Aljazeera_eng.svg.png",
+        category: "news",
+        description: "International News Channel",
+        streamType: "m3u8",
+        active: true
+    },
+    {
+        id: 5,
+        name: "Lofi Girl Radio",
+        url: "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+        logo: "https://yt3.googleusercontent.com/2YQXS_emon2PnADRRIB9JGrGGhbnCgAIWcuXzXdZa0FTKqdTA2Jt6om0A-fD8PXJ6cGbT_NJcg=s176-c-k-c0x00ffffff-no-rj",
+        category: "music",
+        description: "24/7 Lofi Hip Hop Music",
+        streamType: "youtube",
+        active: true
+    }
+];
 
 let currentChannelIndex = 0;
 let currentCategory = 'all';
@@ -51,28 +102,28 @@ function displayChannels(filter = 'all', searchQuery = '') {
     if (searchQuery) {
         filteredChannels = filteredChannels.filter(ch => 
             ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            ch.description.toLowerCase().includes(searchQuery.toLowerCase())
+            (ch.description && ch.description.toLowerCase().includes(searchQuery.toLowerCase()))
         );
     }
 
     if (filteredChannels.length === 0) {
         channelsGrid.innerHTML = `
-            <div class="no-channels">
-                <i class="fas fa-tv"></i>
-                <p>No channels found</p>
+            <div class="no-channels" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                <i class="fas fa-tv" style="font-size: 4rem; opacity: 0.3; display: block; margin-bottom: 1rem;"></i>
+                <p style="font-size: 1.2rem; opacity: 0.7;">No channels found</p>
             </div>
         `;
         return;
     }
 
-    channelsGrid.innerHTML = filteredChannels.map((channel) => {
-        const streamIcon = {
-            'm3u8': 'fa-stream',
-            'youtube': 'fa-youtube',
-            'mp4': 'fa-film',
-            'embed': 'fa-code'
-        };
+    const streamIcon = {
+        'm3u8': 'fa-stream',
+        'youtube': 'fa-youtube',
+        'mp4': 'fa-film',
+        'embed': 'fa-code'
+    };
 
+    channelsGrid.innerHTML = filteredChannels.map((channel) => {
         return `
             <div class="channel-card" data-id="${channel.id}">
                 <div class="channel-logo">
@@ -124,18 +175,20 @@ function playChannel(index) {
     if (!playerSection) return;
 
     // Update channel info
-    channelName.textContent = channel.name;
-    channelDesc.textContent = channel.description;
-    streamTypeBadge.textContent = channel.streamType.toUpperCase();
-    streamTypeBadge.className = `stream-type-badge ${channel.streamType}`;
+    if (channelName) channelName.textContent = channel.name;
+    if (channelDesc) channelDesc.textContent = channel.description || '';
+    if (streamTypeBadge) {
+        streamTypeBadge.textContent = channel.streamType.toUpperCase();
+        streamTypeBadge.className = `stream-type-badge ${channel.streamType}`;
+    }
 
     // Show player
     playerSection.style.display = 'flex';
 
     // Hide all players first
-    videoPlayer.style.display = 'none';
-    youtubePlayerDiv.style.display = 'none';
-    embedPlayer.style.display = 'none';
+    if (videoPlayer) videoPlayer.style.display = 'none';
+    if (youtubePlayerDiv) youtubePlayerDiv.style.display = 'none';
+    if (embedPlayer) embedPlayer.style.display = 'none';
 
     // Stop any existing playback
     if (hls) {
@@ -150,31 +203,39 @@ function playChannel(index) {
     // Load appropriate player based on stream type
     switch(channel.streamType) {
         case 'm3u8':
-            videoPlayer.style.display = 'block';
-            playM3U8(channel.url, videoPlayer);
+            if (videoPlayer) {
+                videoPlayer.style.display = 'block';
+                playM3U8(channel.url, videoPlayer);
+            }
             break;
             
         case 'youtube':
-            youtubePlayerDiv.style.display = 'block';
-            playYouTube(channel.url, youtubePlayerDiv);
+            if (youtubePlayerDiv) {
+                youtubePlayerDiv.style.display = 'block';
+                playYouTube(channel.url, youtubePlayerDiv);
+            }
             break;
             
         case 'mp4':
-            videoPlayer.style.display = 'block';
-            videoPlayer.src = channel.url;
-            videoPlayer.play();
+            if (videoPlayer) {
+                videoPlayer.style.display = 'block';
+                videoPlayer.src = channel.url;
+                videoPlayer.play().catch(e => console.error('Playback error:', e));
+            }
             break;
             
         case 'embed':
-            embedPlayer.style.display = 'block';
-            embedPlayer.src = channel.url;
+            if (embedPlayer) {
+                embedPlayer.style.display = 'block';
+                embedPlayer.src = channel.url;
+            }
             break;
     }
 }
 
 // Play M3U8 stream
 function playM3U8(url, videoElement) {
-    if (Hls.isSupported()) {
+    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
         hls = new Hls({
             enableWorker: true,
             lowLatencyMode: true,
@@ -187,16 +248,17 @@ function playM3U8(url, videoElement) {
         hls.on(Hls.Events.ERROR, function(event, data) {
             if (data.fatal) {
                 console.error('HLS Error:', data);
-                alert('Error loading stream. Please try another channel.');
+                alert('Error loading stream. The stream might be offline or the URL is incorrect.');
             }
         });
     } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+        // For Safari
         videoElement.src = url;
         videoElement.addEventListener('loadedmetadata', function() {
-            videoElement.play();
+            videoElement.play().catch(e => console.error('Playback error:', e));
         });
     } else {
-        alert('Your browser does not support HLS playback.');
+        alert('Your browser does not support HLS playback. Please try a different browser.');
     }
 }
 
@@ -233,7 +295,7 @@ function playYouTube(url, containerElement) {
             events: {
                 'onError': function(event) {
                     console.error('YouTube Player Error:', event.data);
-                    alert('Error loading YouTube stream.');
+                    alert('Error loading YouTube stream. The video might be unavailable.');
                 }
             }
         });
@@ -242,7 +304,7 @@ function playYouTube(url, containerElement) {
         playerDiv.innerHTML = `
             <iframe width="100%" height="100%" 
                 src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
-                frameborder="0" allowfullscreen>
+                frameborder="0" allowfullscreen allow="autoplay">
             </iframe>
         `;
     }
@@ -281,6 +343,8 @@ function closePlayer() {
 // Next channel
 function nextChannel() {
     const activeChannels = channels.filter(ch => ch.active !== false);
+    if (activeChannels.length === 0) return;
+    
     const currentChannel = channels[currentChannelIndex];
     const currentActiveIndex = activeChannels.findIndex(ch => ch.id === currentChannel.id);
     const nextActiveIndex = (currentActiveIndex + 1) % activeChannels.length;
@@ -292,6 +356,8 @@ function nextChannel() {
 // Previous channel
 function prevChannel() {
     const activeChannels = channels.filter(ch => ch.active !== false);
+    if (activeChannels.length === 0) return;
+    
     const currentChannel = channels[currentChannelIndex];
     const currentActiveIndex = activeChannels.findIndex(ch => ch.id === currentChannel.id);
     const prevActiveIndex = (currentActiveIndex - 1 + activeChannels.length) % activeChannels.length;
@@ -305,13 +371,18 @@ function submitChannel(e) {
     e.preventDefault();
     
     const id = document.getElementById('editChannelId').value;
-    const name = document.getElementById('channelName').value;
-    const url = document.getElementById('channelUrl').value;
-    const logo = document.getElementById('channelLogo').value;
+    const name = document.getElementById('channelName').value.trim();
+    const url = document.getElementById('channelUrl').value.trim();
+    const logo = document.getElementById('channelLogo').value.trim();
     const category = document.getElementById('channelCategory').value;
-    const description = document.getElementById('channelDesc').value;
+    const description = document.getElementById('channelDesc').value.trim();
     const streamType = document.getElementById('streamType').value;
     const active = document.getElementById('channelActive').checked;
+
+    if (!name || !url || !category || !streamType) {
+        alert('Please fill in all required fields!');
+        return;
+    }
 
     const channelData = {
         name,
@@ -344,11 +415,21 @@ function submitChannel(e) {
 
 // Reset form
 function resetForm() {
-    document.getElementById('channelForm').reset();
-    document.getElementById('editChannelId').value = '';
-    document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Channel';
-    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-plus"></i> Add Channel';
-    document.getElementById('cancelEdit').style.display = 'none';
+    const form = document.getElementById('channelForm');
+    if (form) form.reset();
+    
+    const editId = document.getElementById('editChannelId');
+    if (editId) editId.value = '';
+    
+    const formTitle = document.getElementById('formTitle');
+    if (formTitle) formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Channel';
+    
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Channel';
+    
+    const cancelBtn = document.getElementById('cancelEdit');
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    
     isEditMode = false;
 }
 
@@ -392,12 +473,12 @@ function displayAdminChannels(filterCategory = '', searchQuery = '') {
     if (searchQuery) {
         filteredChannels = filteredChannels.filter(ch => 
             ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            ch.description.toLowerCase().includes(searchQuery.toLowerCase())
+            (ch.description && ch.description.toLowerCase().includes(searchQuery.toLowerCase()))
         );
     }
 
     if (filteredChannels.length === 0) {
-        channelsList.innerHTML = '<p class="no-data">No channels found.</p>';
+        channelsList.innerHTML = '<p class="no-data" style="text-align: center; padding: 2rem; opacity: 0.7;">No channels found.</p>';
         return;
     }
 
@@ -445,8 +526,8 @@ function deleteChannel(id) {
         displayAdminChannels();
         
         // Reset form if editing this channel
-        const editingId = document.getElementById('editChannelId').value;
-        if (editingId && parseInt(editingId) === id) {
+        const editingId = document.getElementById('editChannelId');
+        if (editingId && editingId.value && parseInt(editingId.value) === id) {
             resetForm();
         }
     }
@@ -454,10 +535,10 @@ function deleteChannel(id) {
 
 // Update URL help text based on stream type
 function updateUrlHelp() {
-    const streamType = document.getElementById('streamType')?.value;
+    const streamType = document.getElementById('streamType');
     const urlHelp = document.getElementById('urlHelp');
     
-    if (!urlHelp) return;
+    if (!urlHelp || !streamType) return;
 
     const helpTexts = {
         'm3u8': 'Enter M3U8/HLS stream URL (e.g., https://example.com/stream.m3u8)',
@@ -466,13 +547,17 @@ function updateUrlHelp() {
         'embed': 'Enter embed URL or iframe source URL'
     };
 
-    urlHelp.innerHTML = `<i class="fas fa-info-circle"></i> ${helpTexts[streamType] || 'Select a stream type first'}`;
+    urlHelp.innerHTML = `<i class="fas fa-info-circle"></i> ${helpTexts[streamType.value] || 'Select a stream type first'}`;
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded, initializing...');
+    console.log('Total channels:', channels.length);
+    
     // Main page
     if (document.getElementById('channelsGrid')) {
+        console.log('Main page detected');
         displayChannels();
 
         // Category filter
@@ -497,14 +582,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Player controls
-        document.getElementById('closePlayer')?.addEventListener('click', closePlayer);
-        document.getElementById('nextChannel')?.addEventListener('click', nextChannel);
-        document.getElementById('prevChannel')?.addEventListener('click', prevChannel);
+        const closeBtn = document.getElementById('closePlayer');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closePlayer);
+        }
+        
+        const nextBtn = document.getElementById('nextChannel');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', nextChannel);
+        }
+        
+        const prevBtn = document.getElementById('prevChannel');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', prevChannel);
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closePlayer();
-            if (document.getElementById('playerSection').style.display === 'flex') {
+            const playerSection = document.getElementById('playerSection');
+            if (e.key === 'Escape' && playerSection && playerSection.style.display === 'flex') {
+                closePlayer();
+            }
+            if (playerSection && playerSection.style.display === 'flex') {
                 if (e.key === 'ArrowRight') nextChannel();
                 if (e.key === 'ArrowLeft') prevChannel();
             }
@@ -513,25 +612,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Admin page
     if (document.getElementById('channelForm')) {
-        document.getElementById('channelForm').addEventListener('submit', submitChannel);
+        console.log('Admin page detected');
         
-        document.getElementById('cancelEdit')?.addEventListener('click', resetForm);
+        const form = document.getElementById('channelForm');
+        if (form) {
+            form.addEventListener('submit', submitChannel);
+        }
         
-        document.getElementById('streamType')?.addEventListener('change', updateUrlHelp);
+        const cancelBtn = document.getElementById('cancelEdit');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', resetForm);
+        }
+        
+        const streamTypeSelect = document.getElementById('streamType');
+        if (streamTypeSelect) {
+            streamTypeSelect.addEventListener('change', updateUrlHelp);
+        }
         
         // Admin search
-        document.getElementById('adminSearch')?.addEventListener('input', function() {
-            const category = document.getElementById('filterCategory').value;
-            displayAdminChannels(category, this.value);
-        });
+        const adminSearch = document.getElementById('adminSearch');
+        if (adminSearch) {
+            adminSearch.addEventListener('input', function() {
+                const category = document.getElementById('filterCategory').value;
+                displayAdminChannels(category, this.value);
+            });
+        }
         
         // Admin category filter
-        document.getElementById('filterCategory')?.addEventListener('change', function() {
-            const search = document.getElementById('adminSearch').value;
-            displayAdminChannels(this.value, search);
-        });
+        const filterCategory = document.getElementById('filterCategory');
+        if (filterCategory) {
+            filterCategory.addEventListener('change', function() {
+                const search = document.getElementById('adminSearch').value;
+                displayAdminChannels(this.value, search);
+            });
+        }
         
         displayAdminChannels();
         updateStats();
     }
 });
+
+// Make functions globally accessible for onclick handlers
+window.editChannel = editChannel;
+window.deleteChannel = deleteChannel;
