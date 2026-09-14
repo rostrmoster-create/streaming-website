@@ -1,0 +1,491 @@
+/* Add to existing CSS file */
+
+/* ===== Login Page ===== */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 3rem;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header i {
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.login-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+.password-input {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+}
+
+.error-message {
+    background: rgba(255, 118, 117, 0.2);
+    border: 2px solid var(--danger);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message.shake {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.btn-login {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-login:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.login-footer a {
+    color: var(--text-light);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: all 0.3s;
+}
+
+.login-footer a:hover {
+    opacity: 1;
+    color: var(--primary-color);
+}
+
+.default-credentials {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(253, 203, 110, 0.2);
+    border: 2px dashed var(--warning);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.default-credentials p {
+    margin: 0.3rem 0;
+}
+
+/* ===== Admin Updates ===== */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-welcome {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-logout {
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-logout:hover {
+    background: #d63031;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-secondary {
+    background: var(--text-light);
+    color: var(--dark-bg);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background: #b2bec3;
+}
+
+.help-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.stat-item strong {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-input,
+.filter-select {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.channel-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.channel-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.channel-item.inactive {
+    opacity: 0.5;
+}
+
+.channel-item-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.channel-item-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
+}
+
+.channel-item-logo i {
+    font-size: 2rem;
+    color: white;
+}
+
+.channel-item-info h3 {
+    margin-bottom: 0.5rem;
+}
+
+.channel-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.meta-item.active {
+    color: var(--success);
+}
+
+.meta-item.inactive {
+    color: var(--danger);
+}
+
+.channel-item-info p {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.channel-item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-edit,
+.btn-delete {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-edit:hover {
+    background: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.btn-delete {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #d63031;
+    transform: scale(1.1);
+}
+
+/* ===== Stream Type Badges ===== */
+.stream-type {
+    background: rgba(162, 155, 254, 0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.stream-type-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-top: 0.5rem;
+}
+
+.stream-type-badge.m3u8 {
+    background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+}
+
+.stream-type-badge.youtube {
+    background: linear-gradient(135deg, #FF0000, #FF4444);
+}
+
+.stream-type-badge.mp4 {
+    background: linear-gradient(135deg, #00B894, #55EFC4);
+}
+
+.stream-type-badge.embed {
+    background: linear-gradient(135deg, #FDCB6E, #FFA502);
+}
+
+.channel-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+/* ===== YouTube Player Styling ===== */
+#youtubePlayer {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background: black;
+    aspect-ratio: 16/9;
+}
+
+#embedPlayer {
+    width: 100%;
+    height: 70vh;
+    border-radius: 10px;
+    background: black;
+}
+
+/* ===== No Channels Message ===== */
+.no-channels {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.no-channels i {
+    font-size: 5rem;
+    opacity: 0.3;
+    margin-bottom: 1rem;
+}
+
+.no-channels p {
+    font-size: 1.3rem;
+    opacity: 0.7;
+}
+
+.no-data {
+    text-align: center;
+    padding: 2rem;
+    opacity: 0.7;
+}
+
+/* ===== Responsive Updates ===== */
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .channel-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .channel-item-logo {
+        margin: 0 auto;
+    }
+
+    .channel-item-actions {
+        justify-content: center;
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+    }
+}
