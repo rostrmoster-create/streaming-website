@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - StreamHub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div>
+                <h1><i class="fas fa-cog"></i> Admin Panel</h1>
+                <p class="admin-welcome">Welcome, <span id="adminEmail"></span></p>
+            </div>
+            <div class="admin-actions">
+                <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Site</a>
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <!-- Add/Edit Channel Form -->
+            <div class="admin-card">
+                <h2 id="formTitle">
+                    <i class="fas fa-plus-circle"></i> Add New Channel
+                </h2>
+                <form id="channelForm">
+                    <input type="hidden" id="editChannelId">
+                    
+                    <div class="form-group">
+                        <label>Channel Name *</label>
+                        <input type="text" id="channelName" required placeholder="e.g., ESPN HD">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stream Type *</label>
+                        <select id="streamType" required>
+                            <option value="">Select Stream Type</option>
+                            <option value="m3u8">M3U8/HLS Stream</option>
+                            <option value="youtube">YouTube Live</option>
+                            <option value="mp4">Direct MP4 Link</option>
+                            <option value="embed">Embed URL</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stream URL *</label>
+                        <input type="url" id="channelUrl" required placeholder="Enter stream URL">
+                        <small class="help-text" id="urlHelp">
+                            <i class="fas fa-info-circle"></i> 
+                            Enter the appropriate URL based on stream type selected above
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Channel Logo URL</label>
+                        <input type="url" id="channelLogo" placeholder="https://example.com/logo.png">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="channelCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="sports">Sports</option>
+                            <option value="news">News</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="movies">Movies</option>
+                            <option value="music">Music</option>
+                            <option value="kids">Kids</option>
+                            <option value="documentary">Documentary</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="channelDesc" rows="3" placeholder="Channel description..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="channelActive" checked>
+                            <span>Active (Channel visible to users)</span>
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            <i class="fas fa-plus"></i> Add Channel
+                        </button>
+                        <button type="button" class="btn-secondary" id="cancelEdit" style="display: none;">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Channels List -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <h2><i class="fas fa-list"></i> Manage Channels</h2>
+                    <div class="stats">
+                        <span class="stat-item">
+                            <i class="fas fa-tv"></i> 
+                            Total: <strong id="totalChannels">0</strong>
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-check-circle"></i> 
+                            Active: <strong id="activeChannels">0</strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <input type="text" id="adminSearch" placeholder="Search channels..." class="search-input">
+                    <select id="filterCategory" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="sports">Sports</option>
+                        <option value="news">News</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="movies">Movies</option>
+                        <option value="music">Music</option>
+                        <option value="kids">Kids</option>
+                        <option value="documentary">Documentary</option>
+                    </select>
+                </div>
+
+                <div class="channels-list" id="channelsList">
+                    <!-- Channels will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Modal -->
+        <div id="changePasswordModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> Change Password</h3>
+                    <button class="close-modal" id="closePasswordModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" id="confirmPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Update Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Check authentication on page load
+        checkAuth();
+    </script>
+</body>
+</html>
