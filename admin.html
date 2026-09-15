@@ -381,4 +381,140 @@
                 if (index !== -1) {
                     channels[index] = { ...channels[index], ...channelData };
                 }
+                alert(translations[lang].channelUpdated);
+            } else {
+                channelData.id = Date.now();
+                channels.push(channelData);
+                alert(translations[lang].channelAdded);
+            }
+
+            saveChannels();
+            resetForm();
+            displayAdminChannels();
+        });
+
+        // Reset form
+        function resetForm() {
+            const lang = getCurrentLanguage();
+            document.getElementById('channelForm').reset();
+            document.getElementById('editChannelId').value = '';
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-plus-circle"></i> <span data-i18n="addChannel">${translations[lang].addChannel}</span>`;
+            document.getElementById('submitBtn').innerHTML = `<i class="fas fa-plus"></i> <span data-i18n="addChannelBtn">${translations[lang].addChannelBtn}</span>`;
+            document.getElementById('cancelEdit').style.display = 'none';
+        }
+
+        document.getElementById('cancelEdit').addEventListener('click', resetForm);
+
+        // Edit channel
+        window.editChannel = function(id) {
+            const lang = getCurrentLanguage();
+            const channel = channels.find(ch => ch.id === id);
+            if (!channel) return;
+
+            document.getElementById('editChannelId').value = channel.id;
+            document.getElementById('channelName').value = channel.name;
+            document.getElementById('channelUrl').value = channel.url;
+            document.getElementById('channelLogo').value = channel.logo || '';
+            document.getElementById('channelCategory').value = channel.category;
+            document.getElementById('channelDesc').value = channel.description || '';
+            document.getElementById('streamType').value = channel.streamType;
+            document.getElementById('channelActive').checked = channel.active !== false;
+
+            document.getElementById('formTitle').innerHTML = `<i class="fas fa-edit"></i> <span data-i18n="editChannel">${translations[lang].editChannel}</span>`;
+            document.getElementById('submitBtn').innerHTML = `<i class="fas fa-save"></i> <span data-i18n="updateChannel">${translations[lang].updateChannel}</span>`;
+            document.getElementById('cancelEdit').style.display = 'inline-block';
+            
+            updateUrlHelp();
+            document.querySelector('.admin-card').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Delete channel
+        window.deleteChannel = function(id) {
+            const lang = getCurrentLanguage();
+            if (confirm(translations[lang].deleteConfirm)) {
+                channels = channels.filter(ch => ch.id !== id);
+                saveChannels();
+                displayAdminChannels();
                 
+                const editingId = document.getElementById('editChannelId').value;
+                if (editingId && parseInt(editingId) === id) {
+                    resetForm();
+                }
+            }
+        };
+
+        // Display admin channels
+        function displayAdminChannels(filterCategory = '', searchQuery = '') {
+            const lang = getCurrentLanguage();
+            const channelsList = document.getElementById('channelsList');
+            let filteredChannels = [...channels];
+
+            if (filterCategory) {
+                filteredChannels = filteredChannels.filter(ch => ch.category === filterCategory);
+            }
+
+            if (searchQuery) {
+                filteredChannels = filteredChannels.filter(ch =>
+                    ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (ch.description && ch.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+
+            if (filteredChannels.length === 0) {
+                channelsList.innerHTML = `<p class="no-data">${translations[lang].noChannels}</p>`;
+                return;
+            }
+
+            channelsList.innerHTML = filteredChannels.map(channel => `
+                <div class="channel-item ${channel.active === false ? 'inactive' : ''}">
+                    <div class="channel-item-logo">
+                        ${channel.logo ? 
+                            `<img src="${channel.logo}" alt="${channel.name}">` : 
+                            `<i class="fas fa-tv"></i>`
+                        }
+                    </div>
+                    <div class="channel-item-info">
+                        <h3>${channel.name}</h3>
+                        <div class="channel-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-folder"></i> ${translations[lang][channel.category] || channel.category}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-broadcast-tower"></i> ${channel.streamType}
+                            </span>
+                            <span class="meta-item ${channel.active !== false ? 'active' : 'inactive'}">
+                                <i class="fas fa-circle"></i> 
+                                ${channel.active !== false ? (lang === 'ar' ? 'نشط' : 'Active') : (lang === 'ar' ? 'غير نشط' : 'Inactive')}
+                            </span>
+                        </div>
+                        <p>${channel.description || translations[lang].noDescription}</p>
+                    </div>
+                    <div class="channel-item-actions">
+                        <button class="btn-edit" onclick="editChannel(${channel.id})" title="${lang === 'ar' ? 'تعديل' : 'Edit'}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-delete" onclick="deleteChannel(${channel.id})" title="${lang === 'ar' ? 'حذف' : 'Delete'}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Event listeners for filtering
+        document.getElementById('adminSearch').addEventListener('input', function() {
+            const category = document.getElementById('filterCategory').value;
+            displayAdminChannels(category, this.value);
+        });
+
+        document.getElementById('filterCategory').addEventListener('change', function() {
+            const search = document.getElementById('adminSearch').value;
+            displayAdminChannels(this.value, search);
+        });
+
+        // Initialize
+        displayAdminChannels();
+        updateStats();
+    </script>
+</body>
+</html>
