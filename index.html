@@ -3,94 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title data-i18n="siteName">StreamHub - Live TV Channels</title>
+
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap"
+          rel="stylesheet">
 </head>
+
 <body>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
+
             <div class="logo">
                 <i class="fas fa-tv"></i>
                 <span data-i18n="siteName">StreamHub</span>
             </div>
+
             <nav class="nav">
-                <a href="#" class="nav-link active" data-category="all" data-i18n="allChannels">All Channels</a>
-                <a href="#" class="nav-link" data-category="sports" data-i18n="sports">Sports</a>
-                <a href="#" class="nav-link" data-category="news" data-i18n="news">News</a>
-                <a href="#" class="nav-link" data-category="entertainment" data-i18n="entertainment">Entertainment</a>
-                <a href="#" class="nav-link" data-category="movies" data-i18n="movies">Movies</a>
-                <a href="#" class="nav-link" data-category="music" data-i18n="music">Music</a>
-                <a href="#" class="nav-link" data-category="documentary" data-i18n="documentary">Documentary</a>
+                <a href="#" class="nav-link active" data-category="all" data-i18n="allChannels">
+                    All Channels
+                </a>
+
+                <a href="#" class="nav-link" data-category="sports" data-i18n="sports">
+                    Sports
+                </a>
+
+                <a href="#" class="nav-link" data-category="news" data-i18n="news">
+                    News
+                </a>
+
+                <a href="#" class="nav-link" data-category="entertainment" data-i18n="entertainment">
+                    Entertainment
+                </a>
+
+                <a href="#" class="nav-link" data-category="movies" data-i18n="movies">
+                    Movies
+                </a>
+
+                <a href="#" class="nav-link" data-category="music" data-i18n="music">
+                    Music
+                </a>
+
+                <a href="#" class="nav-link" data-category="documentary" data-i18n="documentary">
+                    Documentary
+                </a>
             </nav>
+
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search channels..." data-i18n-placeholder="searchPlaceholder">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search channels..."
+                    data-i18n-placeholder="searchPlaceholder">
             </div>
+
             <div class="language-switcher">
                 <button class="lang-btn active" data-lang="en">
                     <i class="fas fa-globe"></i> English
                 </button>
+
                 <button class="lang-btn" data-lang="ar">
                     <i class="fas fa-globe"></i> العربية
                 </button>
             </div>
+
         </div>
     </header>
 
+
     <!-- Main Content -->
     <main class="main-content">
+
         <div class="container">
-            <!-- Video Player Section -->
+
+            <!-- Video Player -->
             <div class="player-section" id="playerSection">
+
                 <div class="player-container">
-                    <button class="close-player" id="closePlayer" title="Close">
+
+                    <button
+                        class="close-player"
+                        id="closePlayer"
+                        title="Close">
+
                         <i class="fas fa-times"></i>
+
                     </button>
+
                     <div class="player-header">
-                        <h2 id="currentChannelName">Channel Name</h2>
-                        <p id="currentChannelDesc">Channel Description</p>
-                        <span class="stream-type-badge" id="streamTypeBadge"></span>
+
+                        <h2 id="currentChannelName">
+                            Channel Name
+                        </h2>
+
+                        <p id="currentChannelDesc">
+                            Channel Description
+                        </p>
+
+                        <span
+                            class="stream-type-badge"
+                            id="streamTypeBadge">
+                        </span>
+
                     </div>
-                    <video id="videoPlayer" controls autoplay style="display: none;"></video>
-                    <div id="youtubePlayer" style="display: none;"></div>
-                    <iframe id="embedPlayer" style="display: none;" allowfullscreen></iframe>
+
+                    <video
+                        id="videoPlayer"
+                        controls
+                        autoplay
+                        style="display: none;">
+                    </video>
+
+                    <div
+                        id="youtubePlayer"
+                        style="display: none;">
+                    </div>
+
+                    <iframe
+                        id="embedPlayer"
+                        style="display: none;"
+                        allowfullscreen>
+                    </iframe>
+
                     <div class="player-controls">
-                        <button class="control-btn" id="prevChannel">
-                            <i class="fas fa-backward"></i> <span data-i18n="previous">Previous</span>
+
+                        <button
+                            class="control-btn"
+                            id="prevChannel">
+
+                            <i class="fas fa-backward"></i>
+
+                            <span data-i18n="previous">
+                                Previous
+                            </span>
+
                         </button>
-                        <button class="control-btn" id="nextChannel">
-                            <span data-i18n="next">Next</span> <i class="fas fa-forward"></i>
+
+                        <button
+                            class="control-btn"
+                            id="nextChannel">
+
+                            <span data-i18n="next">
+                                Next
+                            </span>
+
+                            <i class="fas fa-forward"></i>
+
                         </button>
+
                     </div>
+
                 </div>
             </div>
 
-            <!-- Channels Grid -->
+
+            <!-- Channels -->
             <div class="channels-section">
-                <h1 class="section-title" data-i18n="liveTV">Live TV Channels</h1>
-                <div class="channels-grid" id="channelsGrid">
-                    <p style="grid-column: 1/-1; text-align: center;" data-i18n="loadingChannels">Loading channels...</p>
+
+                <h1
+                    class="section-title"
+                    data-i18n="liveTV">
+
+                    Live TV Channels
+
+                </h1>
+
+                <div
+                    class="channels-grid"
+                    id="channelsGrid">
+
+                    <p
+                        style="grid-column:1/-1;text-align:center;"
+                        data-i18n="loadingChannels">
+
+                        Loading channels...
+
+                    </p>
+
                 </div>
+
             </div>
+
         </div>
+
     </main>
+
 
     <!-- Footer -->
     <footer class="footer">
+
         <div class="container">
-            <p data-i18n="copyright">&copy; 2024 StreamHub. All rights reserved.</p>
-            <a href="login.html" class="admin-link">
-                <i class="fas fa-lock"></i> <span data-i18n="adminLogin">Admin Login</span>
+
+            <p data-i18n="copyright">
+                &copy; 2024 StreamHub. All rights reserved.
+            </p>
+
+            <a
+                href="login.html"
+                class="admin-link">
+
+                <i class="fas fa-lock"></i>
+
+                <span data-i18n="adminLogin">
+                    Admin Login
+                </span>
+
             </a>
+
         </div>
+
     </footer>
 
-    <!-- Scripts -->
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL =
+            "https://qmijdfcphqezudfnqvzg.supabase.co";
+
+        const SUPABASE_ANON_KEY =
+            "sb_publishable_375_lc5oTS4IxyZEoLWGXA_ggxoVSTt";
+
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY
+            );
+    </script>
+
+
+    <!-- HLS -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <!-- YouTube -->
     <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- StreamHub App -->
     <script src="js/app.js"></script>
+
 </body>
 </html>
