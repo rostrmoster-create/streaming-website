@@ -1,4 +1,123 @@
-// Initialize channels array from localStorage or use default channels
+// ===== Translation System =====
+const translations = {
+    en: {
+        // Header & Navigation
+        siteName: "StreamHub",
+        allChannels: "All Channels",
+        sports: "Sports",
+        news: "News",
+        entertainment: "Entertainment",
+        movies: "Movies",
+        music: "Music",
+        documentary: "Documentary",
+        kids: "Kids",
+        searchPlaceholder: "Search channels...",
+        
+        // Main Content
+        liveTV: "Live TV Channels",
+        loadingChannels: "Loading channels...",
+        noChannelsFound: "No channels found",
+        noDescription: "No description available",
+        
+        // Player
+        previous: "Previous",
+        next: "Next",
+        
+        // Footer
+        copyright: "© 2024 StreamHub. All rights reserved.",
+        adminLogin: "Admin Login",
+        
+        // Messages
+        streamError: "Error loading stream. The stream might be offline.",
+        invalidYouTube: "Invalid YouTube URL"
+    },
+    ar: {
+        // Header & Navigation
+        siteName: "ستريم هاب",
+        allChannels: "جميع القنوات",
+        sports: "رياضة",
+        news: "أخبار",
+        entertainment: "ترفيه",
+        movies: "أفلام",
+        music: "موسيقى",
+        documentary: "وثائقي",
+        kids: "أطفال",
+        searchPlaceholder: "البحث عن القنوات...",
+        
+        // Main Content
+        liveTV: "قنوات البث المباشر",
+        loadingChannels: "جاري تحميل القنوات...",
+        noChannelsFound: "لم يتم العثور على قنوات",
+        noDescription: "لا يوجد وصف",
+        
+        // Player
+        previous: "السابق",
+        next: "التالي",
+        
+        // Footer
+        copyright: "© 2024 ستريم هاب. جميع الحقوق محفوظة.",
+        adminLogin: "دخول المسؤول",
+        
+        // Messages
+        streamError: "خطأ في تحميل البث. قد يكون البث غير متصل.",
+        invalidYouTube: "رابط يوتيوب غير صالح"
+    }
+};
+
+// Language management functions
+function getCurrentLanguage() {
+    return localStorage.getItem('language') || 'en';
+}
+
+function setCurrentLanguage(lang) {
+    localStorage.setItem('language', lang);
+    updateLanguage();
+}
+
+function updateLanguage() {
+    const lang = getCurrentLanguage();
+
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            // Check if element is a button with icon
+            const icon = el.querySelector('i');
+            if (icon) {
+                const iconHTML = icon.outerHTML;
+                el.innerHTML = key === 'previous' 
+                    ? `${iconHTML} <span data-i18n="${key}">${translations[lang][key]}</span>`
+                    : `<span data-i18n="${key}">${translations[lang][key]}</span> ${iconHTML}`;
+            } else {
+                el.textContent = translations[lang][key];
+            }
+        }
+    });
+
+    // Update placeholder attributes
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[lang] && translations[lang][key]) {
+            el.placeholder = translations[lang][key];
+        }
+    });
+
+    // Update document language and direction
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+    // Update active button in language switcher
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
+
+    // Update page title
+    if (translations[lang].siteName) {
+        document.title = `${translations[lang].siteName} - Live TV Channels`;
+    }
+}
+
+// ===== Channels Data =====
 let channels = JSON.parse(localStorage.getItem('channels')) || [
     {
         id: 1,
@@ -56,27 +175,10 @@ let currentChannelIndex = 0;
 let currentCategory = 'all';
 let hls = null;
 let youtubePlayer = null;
-let isEditMode = false;
 
 // Save channels to localStorage
 function saveChannels() {
     localStorage.setItem('channels', JSON.stringify(channels));
-    updateStats();
-}
-
-// Update statistics
-function updateStats() {
-    const totalElement = document.getElementById('totalChannels');
-    const activeElement = document.getElementById('activeChannels');
-    
-    if (totalElement) {
-        totalElement.textContent = channels.length;
-    }
-    
-    if (activeElement) {
-        const activeCount = channels.filter(ch => ch.active !== false).length;
-        activeElement.textContent = activeCount;
-    }
 }
 
 // Get YouTube video ID from URL
@@ -86,21 +188,18 @@ function getYouTubeVideoId(url) {
     return (match && match[2].length === 11) ? match[2] : null;
 }
 
-// Display channels (Main page)
+// Display channels
 function displayChannels(filter = 'all', searchQuery = '') {
+    const lang = getCurrentLanguage();
     const channelsGrid = document.getElementById('channelsGrid');
-    if (!channelsGrid) return;
-
     let filteredChannels = channels.filter(ch => ch.active !== false);
 
-    // Filter by category
     if (filter !== 'all') {
         filteredChannels = filteredChannels.filter(ch => ch.category === filter);
     }
 
-    // Filter by search query
     if (searchQuery) {
-        filteredChannels = filteredChannels.filter(ch => 
+        filteredChannels = filteredChannels.filter(ch =>
             ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (ch.description && ch.description.toLowerCase().includes(searchQuery.toLowerCase()))
         );
@@ -108,9 +207,9 @@ function displayChannels(filter = 'all', searchQuery = '') {
 
     if (filteredChannels.length === 0) {
         channelsGrid.innerHTML = `
-            <div class="no-channels" style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <i class="fas fa-tv" style="font-size: 4rem; opacity: 0.3; display: block; margin-bottom: 1rem;"></i>
-                <p style="font-size: 1.2rem; opacity: 0.7;">No channels found</p>
+            <div class="no-channels">
+                <i class="fas fa-tv"></i>
+                <p>${translations[lang].noChannelsFound}</p>
             </div>
         `;
         return;
@@ -123,31 +222,28 @@ function displayChannels(filter = 'all', searchQuery = '') {
         'embed': 'fa-code'
     };
 
-    channelsGrid.innerHTML = filteredChannels.map((channel) => {
-        return `
-            <div class="channel-card" data-id="${channel.id}">
-                <div class="channel-logo">
-                    ${channel.logo ? 
-                        `<img src="${channel.logo}" alt="${channel.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-tv\\'></i>'">` : 
-                        `<i class="fas fa-tv"></i>`
-                    }
-                </div>
-                <div class="channel-info">
-                    <h3 class="channel-name">${channel.name}</h3>
-                    <div class="channel-tags">
-                        <span class="channel-category">${channel.category}</span>
-                        <span class="stream-type">
-                            <i class="fas ${streamIcon[channel.streamType] || 'fa-broadcast-tower'}"></i>
-                            ${channel.streamType.toUpperCase()}
-                        </span>
-                    </div>
-                    <p class="channel-desc">${channel.description || 'No description available'}</p>
-                </div>
+    channelsGrid.innerHTML = filteredChannels.map((channel) => `
+        <div class="channel-card" data-id="${channel.id}">
+            <div class="channel-logo">
+                ${channel.logo ?
+                    `<img src="${channel.logo}" alt="${channel.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'fas fa-tv\\'></i>'">` :
+                    `<i class="fas fa-tv"></i>`
+                }
             </div>
-        `;
-    }).join('');
+            <div class="channel-info">
+                <h3 class="channel-name">${channel.name}</h3>
+                <div class="channel-tags">
+                    <span class="channel-category">${translations[lang][channel.category] || channel.category}</span>
+                    <span class="stream-type">
+                        <i class="fas ${streamIcon[channel.streamType] || 'fa-broadcast-tower'}"></i>
+                        ${channel.streamType.toUpperCase()}
+                    </span>
+                </div>
+                <p class="channel-desc">${channel.description || translations[lang].noDescription}</p>
+            </div>
+        </div>
+    `).join('');
 
-    // Add click listeners to channel cards
     document.querySelectorAll('.channel-card').forEach(card => {
         card.addEventListener('click', function() {
             const id = parseInt(this.dataset.id);
@@ -159,38 +255,30 @@ function displayChannels(filter = 'all', searchQuery = '') {
     });
 }
 
-// Play channel with multiple stream type support
+// Play channel
 function playChannel(index) {
     currentChannelIndex = index;
     const channel = channels[index];
-    
+    const lang = getCurrentLanguage();
+
     const playerSection = document.getElementById('playerSection');
     const videoPlayer = document.getElementById('videoPlayer');
     const youtubePlayerDiv = document.getElementById('youtubePlayer');
     const embedPlayer = document.getElementById('embedPlayer');
-    const channelName = document.getElementById('currentChannelName');
-    const channelDesc = document.getElementById('currentChannelDesc');
-    const streamTypeBadge = document.getElementById('streamTypeBadge');
 
-    if (!playerSection) return;
+    document.getElementById('currentChannelName').textContent = channel.name;
+    document.getElementById('currentChannelDesc').textContent = channel.description || translations[lang].noDescription;
 
-    // Update channel info
-    if (channelName) channelName.textContent = channel.name;
-    if (channelDesc) channelDesc.textContent = channel.description || '';
-    if (streamTypeBadge) {
-        streamTypeBadge.textContent = channel.streamType.toUpperCase();
-        streamTypeBadge.className = `stream-type-badge ${channel.streamType}`;
-    }
+    const badge = document.getElementById('streamTypeBadge');
+    badge.textContent = channel.streamType.toUpperCase();
+    badge.className = `stream-type-badge ${channel.streamType}`;
 
-    // Show player
     playerSection.style.display = 'flex';
 
-    // Hide all players first
-    if (videoPlayer) videoPlayer.style.display = 'none';
-    if (youtubePlayerDiv) youtubePlayerDiv.style.display = 'none';
-    if (embedPlayer) embedPlayer.style.display = 'none';
+    videoPlayer.style.display = 'none';
+    youtubePlayerDiv.style.display = 'none';
+    embedPlayer.style.display = 'none';
 
-    // Stop any existing playback
     if (hls) {
         hls.destroy();
         hls = null;
@@ -200,41 +288,31 @@ function playChannel(index) {
         youtubePlayer = null;
     }
 
-    // Load appropriate player based on stream type
     switch(channel.streamType) {
         case 'm3u8':
-            if (videoPlayer) {
-                videoPlayer.style.display = 'block';
-                playM3U8(channel.url, videoPlayer);
-            }
+            videoPlayer.style.display = 'block';
+            playM3U8(channel.url, videoPlayer);
             break;
-            
         case 'youtube':
-            if (youtubePlayerDiv) {
-                youtubePlayerDiv.style.display = 'block';
-                playYouTube(channel.url, youtubePlayerDiv);
-            }
+            youtubePlayerDiv.style.display = 'block';
+            playYouTube(channel.url, youtubePlayerDiv);
             break;
-            
         case 'mp4':
-            if (videoPlayer) {
-                videoPlayer.style.display = 'block';
-                videoPlayer.src = channel.url;
-                videoPlayer.play().catch(e => console.error('Playback error:', e));
-            }
+            videoPlayer.style.display = 'block';
+            videoPlayer.src = channel.url;
+            videoPlayer.play().catch(e => console.error('Playback error:', e));
             break;
-            
         case 'embed':
-            if (embedPlayer) {
-                embedPlayer.style.display = 'block';
-                embedPlayer.src = channel.url;
-            }
+            embedPlayer.style.display = 'block';
+            embedPlayer.src = channel.url;
             break;
     }
 }
 
-// Play M3U8 stream
+// Play M3U8
 function playM3U8(url, videoElement) {
+    const lang = getCurrentLanguage();
+    
     if (typeof Hls !== 'undefined' && Hls.isSupported()) {
         hls = new Hls({
             enableWorker: true,
@@ -248,38 +326,36 @@ function playM3U8(url, videoElement) {
         hls.on(Hls.Events.ERROR, function(event, data) {
             if (data.fatal) {
                 console.error('HLS Error:', data);
-                alert('Error loading stream. The stream might be offline or the URL is incorrect.');
+                alert(translations[lang].streamError);
             }
         });
     } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
-        // For Safari
         videoElement.src = url;
         videoElement.addEventListener('loadedmetadata', function() {
             videoElement.play().catch(e => console.error('Playback error:', e));
         });
     } else {
-        alert('Your browser does not support HLS playback. Please try a different browser.');
+        alert(lang === 'ar' ? 
+            'المتصفح الخاص بك لا يدعم تشغيل HLS. يرجى استخدام متصفح آخر.' :
+            'Your browser does not support HLS playback. Please try a different browser.');
     }
 }
 
-// Play YouTube stream
+// Play YouTube
 function playYouTube(url, containerElement) {
+    const lang = getCurrentLanguage();
     const videoId = getYouTubeVideoId(url);
     
     if (!videoId) {
-        alert('Invalid YouTube URL');
+        alert(translations[lang].invalidYouTube);
         return;
     }
 
-    // Clear container
     containerElement.innerHTML = '';
-    
-    // Create unique player div
     const playerDiv = document.createElement('div');
     playerDiv.id = 'yt-player-' + Date.now();
     containerElement.appendChild(playerDiv);
 
-    // Initialize YouTube player
     if (typeof YT !== 'undefined' && YT.Player) {
         youtubePlayer = new YT.Player(playerDiv.id, {
             width: '100%',
@@ -289,21 +365,19 @@ function playYouTube(url, containerElement) {
                 'autoplay': 1,
                 'controls': 1,
                 'rel': 0,
-                'showinfo': 0,
                 'modestbranding': 1
             },
             events: {
                 'onError': function(event) {
                     console.error('YouTube Player Error:', event.data);
-                    alert('Error loading YouTube stream. The video might be unavailable.');
+                    alert(translations[lang].streamError);
                 }
             }
         });
     } else {
-        // Fallback to iframe
         playerDiv.innerHTML = `
-            <iframe width="100%" height="100%" 
-                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+            <iframe width="100%" height="100%"
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1"
                 frameborder="0" allowfullscreen allow="autoplay">
             </iframe>
         `;
@@ -312,35 +386,23 @@ function playYouTube(url, containerElement) {
 
 // Close player
 function closePlayer() {
-    const playerSection = document.getElementById('playerSection');
+    document.getElementById('playerSection').style.display = 'none';
     const videoPlayer = document.getElementById('videoPlayer');
-    
-    if (playerSection) {
-        playerSection.style.display = 'none';
-    }
-    
-    if (videoPlayer) {
-        videoPlayer.pause();
-        videoPlayer.src = '';
-    }
+    videoPlayer.pause();
+    videoPlayer.src = '';
     
     if (hls) {
         hls.destroy();
         hls = null;
     }
-    
     if (youtubePlayer) {
         youtubePlayer.destroy();
         youtubePlayer = null;
     }
-    
-    const embedPlayer = document.getElementById('embedPlayer');
-    if (embedPlayer) {
-        embedPlayer.src = '';
-    }
+    document.getElementById('embedPlayer').src = '';
 }
 
-// Next channel
+// Next/Previous channel
 function nextChannel() {
     const activeChannels = channels.filter(ch => ch.active !== false);
     if (activeChannels.length === 0) return;
@@ -348,12 +410,11 @@ function nextChannel() {
     const currentChannel = channels[currentChannelIndex];
     const currentActiveIndex = activeChannels.findIndex(ch => ch.id === currentChannel.id);
     const nextActiveIndex = (currentActiveIndex + 1) % activeChannels.length;
-    const nextChannel = activeChannels[nextActiveIndex];
-    const nextIndex = channels.findIndex(ch => ch.id === nextChannel.id);
+    const nextCh = activeChannels[nextActiveIndex];
+    const nextIndex = channels.findIndex(ch => ch.id === nextCh.id);
     playChannel(nextIndex);
 }
 
-// Previous channel
 function prevChannel() {
     const activeChannels = channels.filter(ch => ch.active !== false);
     if (activeChannels.length === 0) return;
@@ -361,297 +422,75 @@ function prevChannel() {
     const currentChannel = channels[currentChannelIndex];
     const currentActiveIndex = activeChannels.findIndex(ch => ch.id === currentChannel.id);
     const prevActiveIndex = (currentActiveIndex - 1 + activeChannels.length) % activeChannels.length;
-    const prevChannel = activeChannels[prevActiveIndex];
-    const prevIndex = channels.findIndex(ch => ch.id === prevChannel.id);
+    const prevCh = activeChannels[prevActiveIndex];
+    const prevIndex = channels.findIndex(ch => ch.id === prevCh.id);
     playChannel(prevIndex);
-}
-
-// Admin: Add/Edit channel
-function submitChannel(e) {
-    e.preventDefault();
-    
-    const id = document.getElementById('editChannelId').value;
-    const name = document.getElementById('channelName').value.trim();
-    const url = document.getElementById('channelUrl').value.trim();
-    const logo = document.getElementById('channelLogo').value.trim();
-    const category = document.getElementById('channelCategory').value;
-    const description = document.getElementById('channelDesc').value.trim();
-    const streamType = document.getElementById('streamType').value;
-    const active = document.getElementById('channelActive').checked;
-
-    if (!name || !url || !category || !streamType) {
-        alert('Please fill in all required fields!');
-        return;
-    }
-
-    const channelData = {
-        name,
-        url,
-        logo,
-        category,
-        description,
-        streamType,
-        active
-    };
-
-    if (id) {
-        // Edit existing channel
-        const index = channels.findIndex(ch => ch.id === parseInt(id));
-        if (index !== -1) {
-            channels[index] = { ...channels[index], ...channelData };
-        }
-    } else {
-        // Add new channel
-        channelData.id = Date.now();
-        channels.push(channelData);
-    }
-
-    saveChannels();
-    resetForm();
-    displayAdminChannels();
-    
-    alert(id ? 'Channel updated successfully!' : 'Channel added successfully!');
-}
-
-// Reset form
-function resetForm() {
-    const form = document.getElementById('channelForm');
-    if (form) form.reset();
-    
-    const editId = document.getElementById('editChannelId');
-    if (editId) editId.value = '';
-    
-    const formTitle = document.getElementById('formTitle');
-    if (formTitle) formTitle.innerHTML = '<i class="fas fa-plus-circle"></i> Add New Channel';
-    
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Channel';
-    
-    const cancelBtn = document.getElementById('cancelEdit');
-    if (cancelBtn) cancelBtn.style.display = 'none';
-    
-    isEditMode = false;
-}
-
-// Edit channel
-function editChannel(id) {
-    const channel = channels.find(ch => ch.id === id);
-    if (!channel) return;
-
-    document.getElementById('editChannelId').value = channel.id;
-    document.getElementById('channelName').value = channel.name;
-    document.getElementById('channelUrl').value = channel.url;
-    document.getElementById('channelLogo').value = channel.logo || '';
-    document.getElementById('channelCategory').value = channel.category;
-    document.getElementById('channelDesc').value = channel.description || '';
-    document.getElementById('streamType').value = channel.streamType;
-    document.getElementById('channelActive').checked = channel.active !== false;
-
-    document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Channel';
-    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update Channel';
-    document.getElementById('cancelEdit').style.display = 'inline-block';
-    
-    isEditMode = true;
-
-    // Scroll to form
-    document.querySelector('.admin-card').scrollIntoView({ behavior: 'smooth' });
-}
-
-// Admin: Display channels list
-function displayAdminChannels(filterCategory = '', searchQuery = '') {
-    const channelsList = document.getElementById('channelsList');
-    if (!channelsList) return;
-
-    let filteredChannels = [...channels];
-
-    // Filter by category
-    if (filterCategory) {
-        filteredChannels = filteredChannels.filter(ch => ch.category === filterCategory);
-    }
-
-    // Filter by search
-    if (searchQuery) {
-        filteredChannels = filteredChannels.filter(ch => 
-            ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (ch.description && ch.description.toLowerCase().includes(searchQuery.toLowerCase()))
-        );
-    }
-
-    if (filteredChannels.length === 0) {
-        channelsList.innerHTML = '<p class="no-data" style="text-align: center; padding: 2rem; opacity: 0.7;">No channels found.</p>';
-        return;
-    }
-
-    channelsList.innerHTML = filteredChannels.map(channel => `
-        <div class="channel-item ${channel.active === false ? 'inactive' : ''}">
-            <div class="channel-item-logo">
-                ${channel.logo ? 
-                    `<img src="${channel.logo}" alt="${channel.name}">` : 
-                    `<i class="fas fa-tv"></i>`
-                }
-            </div>
-            <div class="channel-item-info">
-                <h3>${channel.name}</h3>
-                <div class="channel-meta">
-                    <span class="meta-item">
-                        <i class="fas fa-folder"></i> ${channel.category}
-                    </span>
-                    <span class="meta-item">
-                        <i class="fas fa-broadcast-tower"></i> ${channel.streamType}
-                    </span>
-                    <span class="meta-item ${channel.active !== false ? 'active' : 'inactive'}">
-                        <i class="fas fa-circle"></i> 
-                        ${channel.active !== false ? 'Active' : 'Inactive'}
-                    </span>
-                </div>
-                <p>${channel.description || 'No description'}</p>
-            </div>
-            <div class="channel-item-actions">
-                <button class="btn-edit" onclick="editChannel(${channel.id})" title="Edit">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-delete" onclick="deleteChannel(${channel.id})" title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Admin: Delete channel
-function deleteChannel(id) {
-    if (confirm('Are you sure you want to delete this channel?')) {
-        channels = channels.filter(ch => ch.id !== id);
-        saveChannels();
-        displayAdminChannels();
-        
-        // Reset form if editing this channel
-        const editingId = document.getElementById('editChannelId');
-        if (editingId && editingId.value && parseInt(editingId.value) === id) {
-            resetForm();
-        }
-    }
-}
-
-// Update URL help text based on stream type
-function updateUrlHelp() {
-    const streamType = document.getElementById('streamType');
-    const urlHelp = document.getElementById('urlHelp');
-    
-    if (!urlHelp || !streamType) return;
-
-    const helpTexts = {
-        'm3u8': 'Enter M3U8/HLS stream URL (e.g., https://example.com/stream.m3u8)',
-        'youtube': 'Enter YouTube video or live stream URL (e.g., https://youtube.com/watch?v=...)',
-        'mp4': 'Enter direct MP4 video URL (e.g., https://example.com/video.mp4)',
-        'embed': 'Enter embed URL or iframe source URL'
-    };
-
-    urlHelp.innerHTML = `<i class="fas fa-info-circle"></i> ${helpTexts[streamType.value] || 'Select a stream type first'}`;
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded, initializing...');
-    console.log('Total channels:', channels.length);
-    
-    // Main page
-    if (document.getElementById('channelsGrid')) {
-        console.log('Main page detected');
-        displayChannels();
+    // Initialize language
+    updateLanguage();
 
-        // Category filter
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                
-                currentCategory = this.dataset.category;
-                displayChannels(currentCategory);
-            });
+    // Add language switcher event listeners
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            setCurrentLanguage(this.getAttribute('data-lang'));
+            displayChannels(currentCategory); // Refresh channels with new language
         });
+    });
 
-        // Search
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                displayChannels(currentCategory, this.value);
-            });
-        }
+    // Save initial channels to localStorage if empty
+    if (!localStorage.getItem('channels')) {
+        saveChannels();
+    }
 
-        // Player controls
-        const closeBtn = document.getElementById('closePlayer');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', closePlayer);
-        }
-        
-        const nextBtn = document.getElementById('nextChannel');
-        if (nextBtn) {
-            nextBtn.addEventListener('click', nextChannel);
-        }
-        
-        const prevBtn = document.getElementById('prevChannel');
-        if (prevBtn) {
-            prevBtn.addEventListener('click', prevChannel);
-        }
+    displayChannels();
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            const playerSection = document.getElementById('playerSection');
-            if (e.key === 'Escape' && playerSection && playerSection.style.display === 'flex') {
-                closePlayer();
-            }
-            if (playerSection && playerSection.style.display === 'flex') {
-                if (e.key === 'ArrowRight') nextChannel();
-                if (e.key === 'ArrowLeft') prevChannel();
-            }
+    // Category filter
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            currentCategory = this.dataset.category;
+            displayChannels(currentCategory);
+        });
+    });
+
+    // Search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            displayChannels(currentCategory, this.value);
         });
     }
 
-    // Admin page
-    if (document.getElementById('channelForm')) {
-        console.log('Admin page detected');
-        
-        const form = document.getElementById('channelForm');
-        if (form) {
-            form.addEventListener('submit', submitChannel);
-        }
-        
-        const cancelBtn = document.getElementById('cancelEdit');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', resetForm);
-        }
-        
-        const streamTypeSelect = document.getElementById('streamType');
-        if (streamTypeSelect) {
-            streamTypeSelect.addEventListener('change', updateUrlHelp);
-        }
-        
-        // Admin search
-        const adminSearch = document.getElementById('adminSearch');
-        if (adminSearch) {
-            adminSearch.addEventListener('input', function() {
-                const category = document.getElementById('filterCategory').value;
-                displayAdminChannels(category, this.value);
-            });
-        }
-        
-        // Admin category filter
-        const filterCategory = document.getElementById('filterCategory');
-        if (filterCategory) {
-            filterCategory.addEventListener('change', function() {
-                const search = document.getElementById('adminSearch').value;
-                displayAdminChannels(this.value, search);
-            });
-        }
-        
-        displayAdminChannels();
-        updateStats();
+    // Player controls
+    const closeBtn = document.getElementById('closePlayer');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closePlayer);
     }
+
+    const nextBtn = document.getElementById('nextChannel');
+    if (nextBtn) {
+        nextBtn.addEventListener('click', nextChannel);
+    }
+
+    const prevBtn = document.getElementById('prevChannel');
+    if (prevBtn) {
+        prevBtn.addEventListener('click', prevChannel);
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        const playerSection = document.getElementById('playerSection');
+        if (e.key === 'Escape' && playerSection && playerSection.style.display === 'flex') {
+            closePlayer();
+        }
+        if (playerSection && playerSection.style.display === 'flex') {
+            if (e.key === 'ArrowRight') nextChannel();
+            if (e.key === 'ArrowLeft') prevChannel();
+        }
+    });
 });
-
-// Make functions globally accessible for onclick handlers
-window.editChannel = editChannel;
-window.deleteChannel = deleteChannel;
