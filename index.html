@@ -486,19 +486,12 @@
 </footer>
 
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-
 <script>
 
 "use strict";
 
 
-/*
-====================================================
-DEFAULT CHANNELS
-====================================================
-*/
+/* DEFAULT CHANNELS */
 
 const defaultChannels = [
 
@@ -518,7 +511,7 @@ const defaultChannels = [
         name: "NASA TV",
         url: "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8",
         logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/200px-NASA_logo.svg.png",
-        category: "documentary",
+        category: "news",
         description: "NASA's Official Live Stream",
         streamType: "m3u8",
         active: true
@@ -561,68 +554,45 @@ const defaultChannels = [
 
 
 /*
-====================================================
-FIXED CHANNEL LOADING
-====================================================
+    SAFE CHANNEL LOADING
 
-This is the important fix.
-
-If localStorage contains broken JSON,
-the website will NOT crash anymore.
+    If localStorage is broken,
+    the website automatically resets it.
 */
 
 function loadChannels() {
 
     try {
 
-        const savedChannels =
+        const saved =
             localStorage.getItem("channels");
 
-        if (!savedChannels) {
-
+        if (!saved) {
             return defaultChannels.slice();
-
         }
 
-        const parsedChannels =
-            JSON.parse(savedChannels);
+        const parsed =
+            JSON.parse(saved);
 
-        if (!Array.isArray(parsedChannels)) {
-
-            throw new Error("Invalid channels data");
-
+        if (!Array.isArray(parsed)) {
+            throw new Error("Invalid channel data");
         }
 
-        return parsedChannels;
+        return parsed;
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.warn(
-            "Invalid saved channel data. Resetting channels.",
+            "Invalid saved channel data. Resetting.",
             error
         );
 
         try {
-
             localStorage.removeItem("channels");
-
-        }
-
-        catch (storageError) {
-
-            console.warn(
-                "Could not clear local storage.",
-                storageError
-            );
-
-        }
+        } catch (e) {}
 
         return defaultChannels.slice();
-
     }
-
 }
 
 
@@ -634,13 +604,9 @@ let currentCategory = "all";
 
 let hls = null;
 
-let youtubePlayer = null;
-
 
 /*
-====================================================
-DISPLAY CHANNELS
-====================================================
+    DISPLAY CHANNELS
 */
 
 function displayChannels(
@@ -651,7 +617,9 @@ function displayChannels(
     const grid =
         document.getElementById("channelsGrid");
 
-    if (!grid) return;
+    if (!grid) {
+        return;
+    }
 
 
     let filtered =
@@ -669,7 +637,6 @@ function displayChannels(
                 channel =>
                     channel.category === filter
             );
-
     }
 
 
@@ -690,9 +657,7 @@ function displayChannels(
                 String(channel.description || "")
                     .toLowerCase()
                     .includes(query)
-
             );
-
     }
 
 
@@ -706,20 +671,14 @@ function displayChannels(
         `;
 
         return;
-
     }
 
 
     const icons = {
-
         m3u8: "fa-stream",
-
         youtube: "fa-youtube",
-
         mp4: "fa-film",
-
         embed: "fa-code"
-
     };
 
 
@@ -727,19 +686,19 @@ function displayChannels(
 
         const logo =
             channel.logo
-                ? `
-                    <img
-                        src="${channel.logo}"
-                        alt="${channel.name || "Channel"}"
-                        onerror="
-                            this.style.display='none';
-                            this.parentElement
-                                .querySelector('.fallback-icon')
-                                .style.display='block';
-                        "
-                    >
-                  `
-                : "";
+            ? `
+                <img
+                    src="${channel.logo}"
+                    alt="${channel.name || "Channel"}"
+                    onerror="
+                        this.style.display='none';
+                        this.parentElement
+                        .querySelector('.fallback-icon')
+                        .style.display='block';
+                    "
+                >
+            `
+            : "";
 
 
         return `
@@ -777,16 +736,13 @@ function displayChannels(
 
                         <span class="stream-type">
 
-                            <i
-                                class="fas ${
-                                    icons[channel.streamType]
-                                    || "fa-broadcast-tower"
-                                }"
-                            ></i>
+                            <i class="fas ${
+                                icons[channel.streamType]
+                                || "fa-broadcast-tower"
+                            }"></i>
 
                             ${String(
-                                channel.streamType
-                                || "stream"
+                                channel.streamType || "stream"
                             ).toUpperCase()}
 
                         </span>
@@ -795,10 +751,7 @@ function displayChannels(
 
 
                     <p class="channel-desc">
-                        ${
-                            channel.description
-                            || "No description available"
-                        }
+                        ${channel.description || "No description available"}
                     </p>
 
                 </div>
@@ -828,9 +781,7 @@ function displayChannels(
                         );
 
                     if (index >= 0) {
-
                         playChannel(index);
-
                     }
 
                 }
@@ -842,31 +793,7 @@ function displayChannels(
 
 
 /*
-====================================================
-YOUTUBE ID
-====================================================
-*/
-
-function getYouTubeVideoId(url) {
-
-    const match =
-        String(url || "").match(
-            /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
-        );
-
-    return match &&
-           match[2] &&
-           match[2].length === 11
-           ? match[2]
-           : null;
-
-}
-
-
-/*
-====================================================
-PLAY CHANNEL
-====================================================
+    PLAY CHANNEL
 */
 
 function playChannel(index) {
@@ -874,11 +801,12 @@ function playChannel(index) {
     const channel =
         channels[index];
 
-    if (!channel) return;
+    if (!channel) {
+        return;
+    }
 
 
-    currentChannelIndex =
-        index;
+    currentChannelIndex = index;
 
 
     const section =
@@ -886,15 +814,18 @@ function playChannel(index) {
             "playerSection"
         );
 
+
     const video =
         document.getElementById(
             "videoPlayer"
         );
 
+
     const youtube =
         document.getElementById(
             "youtubePlayer"
         );
+
 
     const embed =
         document.getElementById(
@@ -941,38 +872,18 @@ function playChannel(index) {
     embed.style.display = "none";
 
 
-    if (hls) {
-
-        hls.destroy();
-
-        hls = null;
-
-    }
-
-
-    if (youtubePlayer) {
-
-        try {
-
-            youtubePlayer.destroy();
-
-        }
-
-        catch (_) {}
-
-        youtubePlayer = null;
-
-    }
-
-
     if (channel.streamType === "m3u8") {
 
         video.style.display = "block";
 
-        playM3U8(
-            channel.url,
-            video
-        );
+        /*
+            Native browser playback where supported.
+        */
+
+        video.src =
+            channel.url || "";
+
+        video.play().catch(() => {});
 
     }
 
@@ -1014,70 +925,23 @@ function playChannel(index) {
 
 
 /*
-====================================================
-M3U8 PLAYER
-====================================================
+    YOUTUBE
 */
 
-function playM3U8(
-    url,
-    video
-) {
+function getYouTubeVideoId(url) {
 
-    if (
-        typeof Hls !== "undefined" &&
-        Hls.isSupported()
-    ) {
-
-        hls = new Hls();
-
-        hls.loadSource(url);
-
-        hls.attachMedia(video);
-
-        hls.on(
-            Hls.Events.MANIFEST_PARSED,
-            () => {
-
-                video
-                    .play()
-                    .catch(() => {});
-
-            }
+    const match =
+        String(url || "").match(
+            /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
         );
 
-    }
-
-    else if (
-        video.canPlayType(
-            "application/vnd.apple.mpegurl"
-        )
-    ) {
-
-        video.src = url;
-
-        video.addEventListener(
-            "loadedmetadata",
-            () => {
-
-                video
-                    .play()
-                    .catch(() => {});
-
-            },
-            { once: true }
-        );
-
-    }
-
+    return match &&
+        match[2] &&
+        match[2].length === 11
+        ? match[2]
+        : null;
 }
 
-
-/*
-====================================================
-YOUTUBE PLAYER
-====================================================
-*/
 
 function playYouTube(
     url,
@@ -1090,17 +954,10 @@ function playYouTube(
 
     if (!videoId) {
 
-        container.innerHTML = `
-            <p style="
-                padding:2rem;
-                text-align:center
-            ">
-                Invalid YouTube URL.
-            </p>
-        `;
+        container.innerHTML =
+            "<p style='padding:2rem;text-align:center'>Invalid YouTube URL.</p>";
 
         return;
-
     }
 
 
@@ -1134,16 +991,18 @@ function playYouTube(
 
 
 /*
-====================================================
-CLOSE PLAYER
-====================================================
+    CLOSE PLAYER
 */
 
 function closePlayer() {
 
-    document.getElementById(
-        "playerSection"
-    ).style.display = "none";
+    const section =
+        document.getElementById(
+            "playerSection"
+        );
+
+
+    section.style.display = "none";
 
 
     const video =
@@ -1159,15 +1018,6 @@ function closePlayer() {
     video.load();
 
 
-    if (hls) {
-
-        hls.destroy();
-
-        hls = null;
-
-    }
-
-
     document.getElementById(
         "youtubePlayer"
     ).innerHTML = "";
@@ -1181,9 +1031,7 @@ function closePlayer() {
 
 
 /*
-====================================================
-NEXT CHANNEL
-====================================================
+    NEXT
 */
 
 function nextChannel() {
@@ -1196,7 +1044,9 @@ function nextChannel() {
         );
 
 
-    if (!active.length) return;
+    if (!active.length) {
+        return;
+    }
 
 
     const current =
@@ -1231,9 +1081,7 @@ function nextChannel() {
 
 
 /*
-====================================================
-PREVIOUS CHANNEL
-====================================================
+    PREVIOUS
 */
 
 function prevChannel() {
@@ -1246,7 +1094,9 @@ function prevChannel() {
         );
 
 
-    if (!active.length) return;
+    if (!active.length) {
+        return;
+    }
 
 
     const current =
@@ -1281,44 +1131,44 @@ function prevChannel() {
 
 
 /*
-====================================================
-PAGE START
-====================================================
+    START WEBSITE
 */
 
 document.addEventListener(
     "DOMContentLoaded",
-    () => {
+    function () {
 
         displayChannels();
 
 
         document
             .querySelectorAll(".nav-link")
-            .forEach(link => {
+            .forEach(function (link) {
 
                 link.addEventListener(
                     "click",
-                    event => {
+                    function (event) {
 
                         event.preventDefault();
 
 
                         document
                             .querySelectorAll(".nav-link")
-                            .forEach(item =>
+                            .forEach(function (item) {
+
                                 item.classList.remove(
                                     "active"
-                                )
-                            );
+                                );
+
+                            });
 
 
                         link.classList.add("active");
 
 
                         currentCategory =
-                            link.dataset.category
-                            || "all";
+                            link.dataset.category ||
+                            "all";
 
 
                         displayChannels(
@@ -1338,7 +1188,7 @@ document.addEventListener(
             .getElementById("searchInput")
             .addEventListener(
                 "input",
-                event => {
+                function (event) {
 
                     displayChannels(
                         currentCategory,
