@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - StreamHub</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -50,7 +50,7 @@
                         <input type="url" id="channelUrl" required placeholder="Enter stream URL">
                         <small class="help-text" id="urlHelp">
                             <i class="fas fa-info-circle"></i> 
-                            Enter the appropriate URL based on stream type selected above
+                            Select stream type to see URL format
                         </small>
                     </div>
 
@@ -131,42 +131,235 @@
                 </div>
             </div>
         </div>
-
-        <!-- Change Password Modal -->
-        <div id="changePasswordModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-key"></i> Change Password</h3>
-                    <button class="close-modal" id="closePasswordModal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form id="changePasswordForm">
-                    <div class="form-group">
-                        <label>Current Password</label>
-                        <input type="password" id="currentPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" id="newPassword" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm New Password</label>
-                        <input type="password" id="confirmPassword" required minlength="6">
-                    </div>
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> Update Password
-                    </button>
-                </form>
-            </div>
-        </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/app.js"></script>
     <script>
-        // Check authentication on page load
-        checkAuth();
+        // Check authentication
+        const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true';
+        
+        if (!isLoggedIn) {
+            window.location.href = 'login.html';
+        }
+
+        // Display admin email
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        document.getElementById('adminEmail').textContent = adminEmail || 'Admin';
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminEmail');
+                sessionStorage.removeItem('adminLoggedIn');
+                sessionStorage.removeItem('adminEmail');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load channels
+        let channels = JSON.parse(localStorage.getItem('channels')) || [];
+        let isEditMode = false;
+
+        // Save channels
+        function saveChannels() {
+            localStorage.setItem('channels', JSON.stringify(channels));
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalChannels').textContent = channels.length;
+            const activeCount = channels.filter(ch => ch.active !== false).length;
+            document.getElementById('activeChannels').textContent = activeCount;
+        }
+
+        // Update URL help text
+        function updateUrlHelp() {
+            const streamType = document.getElementById('streamType').value;
+            const urlHelp = document.getElementById('urlHelp');
+            
+            const helpTexts = {
+                'm3u8': 'Enter M3U8/HLS stream URL (e.g., https://example.com/stream.m3u8)',
+                'youtube': 'Enter YouTube video or live stream URL (e.g., https://youtube.com/watch?v=...)',
+                'mp4': 'Enter direct MP4 video URL (e.g., https://example.com/video.mp4)',
+                'embed': 'Enter embed URL or iframe source URL'
+            };
+
+            urlHelp.innerHTML = `<i class="fas fa-info-circle"></i> ${helpTexts[streamType] || 'Select a stream type first'}`;
+        }
+
+        document.getElementById('streamType').addEventListener('change', updateUrlHelp);
+
+        // Submit channel form
+        document.getElementById('channelForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editChannelId').value;
+            const name = document.getElementById('channelName').value.trim();
+            const url = document.getElementById('channelUrl').value.trim();
+            const logo = document.getElementById('channelLogo').value.trim();
+            const category = document.getElementById('channelCategory').value;
+            const description = document.getElementById('channelDesc').value.trim();
+            const streamType = document.getElementById('streamType').value;
+            const active = document.getElementById('channelActive').checked;
+
+            if (!name || !url || !category || !streamType) {
+                alert('Please fill in all required fields!');
+                return;
+            }
+
+            const channelData = {
+                name,
+                url,
+                logo,
+                category,
+                description,
+                streamType,
+                active
+            };
+
+            if (id) {
+                // Edit existing channel
+                const index = channels.findIndex(ch => ch.id === parseInt(id));
+                if (index !== -1) {
+                    channels[index] = { ...channels[index], ...channelData };
+                }
+            } else {
+                // Add new channel
+                channelData.id = Date.now();
+                channels.push(channelData);
+            }
+
+            saveChannels();
+            resetForm();
+            displayAdminChannels();
+            
+            alert(id ? 'Channel updated successfully!' : 'Channel added successfully!');
+        });
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('channelForm').reset();
+            document.getElementById('editChannelId').value = '';
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add New Channel';
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-plus"></i> Add Channel';
+            document.getElementById('cancelEdit').style.display = 'none';
+            isEditMode = false;
+        }
+
+        document.getElementById('cancelEdit').addEventListener('click', resetForm);
+
+        // Edit channel
+        function editChannel(id) {
+            const channel = channels.find(ch => ch.id === id);
+            if (!channel) return;
+
+            document.getElementById('editChannelId').value = channel.id;
+            document.getElementById('channelName').value = channel.name;
+            document.getElementById('channelUrl').value = channel.url;
+            document.getElementById('channelLogo').value = channel.logo || '';
+            document.getElementById('channelCategory').value = channel.category;
+            document.getElementById('channelDesc').value = channel.description || '';
+            document.getElementById('streamType').value = channel.streamType;
+            document.getElementById('channelActive').checked = channel.active !== false;
+
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Channel';
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update Channel';
+            document.getElementById('cancelEdit').style.display = 'inline-block';
+            
+            updateUrlHelp();
+            isEditMode = true;
+
+            // Scroll to form
+            document.querySelector('.admin-card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Delete channel
+        function deleteChannel(id) {
+            if (confirm('Are you sure you want to delete this channel?')) {
+                channels = channels.filter(ch => ch.id !== id);
+                saveChannels();
+                displayAdminChannels();
+                
+                const editingId = document.getElementById('editChannelId').value;
+                if (editingId && parseInt(editingId) === id) {
+                    resetForm();
+                }
+            }
+        }
+
+        // Display admin channels
+        function displayAdminChannels(filterCategory = '', searchQuery = '') {
+            const channelsList = document.getElementById('channelsList');
+            let filteredChannels = [...channels];
+
+            if (filterCategory) {
+                filteredChannels = filteredChannels.filter(ch => ch.category === filterCategory);
+            }
+
+            if (searchQuery) {
+                filteredChannels = filteredChannels.filter(ch => 
+                    ch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (ch.description && ch.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+
+            if (filteredChannels.length === 0) {
+                channelsList.innerHTML = '<p class="no-data">No channels found.</p>';
+                return;
+            }
+
+            channelsList.innerHTML = filteredChannels.map(channel => `
+                <div class="channel-item ${channel.active === false ? 'inactive' : ''}">
+                    <div class="channel-item-logo">
+                        ${channel.logo ? 
+                            `<img src="${channel.logo}" alt="${channel.name}">` : 
+                            `<i class="fas fa-tv"></i>`
+                        }
+                    </div>
+                    <div class="channel-item-info">
+                        <h3>${channel.name}</h3>
+                        <div class="channel-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-folder"></i> ${channel.category}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-broadcast-tower"></i> ${channel.streamType}
+                            </span>
+                            <span class="meta-item ${channel.active !== false ? 'active' : 'inactive'}">
+                                <i class="fas fa-circle"></i> 
+                                ${channel.active !== false ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        <p>${channel.description || 'No description'}</p>
+                    </div>
+                    <div class="channel-item-actions">
+                        <button class="btn-edit" onclick="editChannel(${channel.id})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-delete" onclick="deleteChannel(${channel.id})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Admin search
+        document.getElementById('adminSearch').addEventListener('input', function() {
+            const category = document.getElementById('filterCategory').value;
+            displayAdminChannels(category, this.value);
+        });
+
+        // Admin category filter
+        document.getElementById('filterCategory').addEventListener('change', function() {
+            const search = document.getElementById('adminSearch').value;
+            displayAdminChannels(this.value, search);
+        });
+
+        // Initialize
+        displayAdminChannels();
+        updateStats();
     </script>
 </body>
 </html>
