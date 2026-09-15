@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - StreamHub</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -19,13 +19,13 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="loginEmail" required placeholder="admin@streamhub.com">
+                    <input type="email" id="loginEmail" required placeholder="admin@streamhub.com" autocomplete="email">
                 </div>
 
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Password</label>
                     <div class="password-input">
-                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                        <input type="password" id="loginPassword" required placeholder="Enter your password" autocomplete="current-password">
                         <button type="button" class="toggle-password" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -53,15 +53,75 @@
                 <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
             </div>
 
-            <!-- Default Credentials Info (Remove in production) -->
+            <!-- Default Credentials Info -->
             <div class="default-credentials">
                 <p><strong>Default Admin Credentials:</strong></p>
                 <p>Email: admin@streamhub.com</p>
                 <p>Password: admin123</p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">
+                    <i class="fas fa-info-circle"></i> Change these in production!
+                </p>
             </div>
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
+    <script>
+        // Admin credentials
+        const ADMIN_EMAIL = 'admin@streamhub.com';
+        const ADMIN_PASSWORD = 'admin123';
+
+        // Check if already logged in
+        if (localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true') {
+            window.location.href = 'admin.html';
+        }
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('loginPassword');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const remember = document.getElementById('rememberMe').checked;
+            
+            const errorDiv = document.getElementById('loginError');
+            const errorText = document.getElementById('errorText');
+            
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                // Login successful
+                const storage = remember ? localStorage : sessionStorage;
+                storage.setItem('adminLoggedIn', 'true');
+                storage.setItem('adminEmail', email);
+                storage.setItem('loginTime', new Date().getTime());
+                
+                window.location.href = 'admin.html';
+            } else {
+                // Login failed
+                errorText.textContent = 'Invalid email or password';
+                errorDiv.style.display = 'flex';
+                
+                // Shake animation
+                errorDiv.classList.add('shake');
+                setTimeout(() => {
+                    errorDiv.classList.remove('shake');
+                }, 500);
+            }
+        });
+    </script>
 </body>
 </html>
