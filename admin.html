@@ -14,360 +14,183 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        const SUPABASE_URL = "https://qmijdfcphqezudfnqvzg.supabase.co";
+        const SUPABASE_URL =
+            "https://qmijdfcphqezudfnqvzg.supabase.co";
 
         const SUPABASE_ANON_KEY =
             "sb_publishable_375_lc5oTS4IxyZEoLWGXA_ggxoVSTt";
 
-        const supabaseClient = window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_ANON_KEY
-        );
+        const supabaseClient =
+            window.supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_ANON_KEY
+            );
     </script>
 </head>
 
 <body>
 
-    <div class="admin-container">
+<div class="admin-container">
 
-        <header class="admin-header">
+    <header class="admin-header">
 
-            <div>
-                <h1>
-                    <i class="fas fa-cog"></i>
-                    <span data-i18n="adminPanel">Admin Panel</span>
-                </h1>
+        <div>
+            <h1>
+                <i class="fas fa-cog"></i>
+                <span data-i18n="adminPanel">Admin Panel</span>
+            </h1>
 
-                <p class="admin-welcome">
-                    <span data-i18n="welcomeMsg">Welcome,</span>
-                    <span id="adminEmail"></span>
-                </p>
-            </div>
+            <p class="admin-welcome">
+                <span data-i18n="welcomeMsg">Welcome,</span>
+                <span id="adminEmail"></span>
+            </p>
+        </div>
 
-            <div class="admin-actions">
+        <div class="admin-actions">
 
-                <a href="index.html" class="btn-back">
-                    <i class="fas fa-arrow-left"></i>
-                    <span data-i18n="backToSite">Back to Site</span>
-                </a>
+            <a href="index.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                <span data-i18n="backToSite">Back to Site</span>
+            </a>
 
-                <button id="logoutBtn" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span data-i18n="logout">Logout</span>
+            <button id="logoutBtn" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-i18n="logout">Logout</span>
+            </button>
+
+            <div class="language-switcher admin-lang-switcher">
+
+                <button class="lang-btn active" data-lang="en">
+                    <i class="fas fa-globe"></i> EN
                 </button>
 
-                <div class="language-switcher admin-lang-switcher">
-
-                    <button class="lang-btn active" data-lang="en">
-                        <i class="fas fa-globe"></i> EN
-                    </button>
-
-                    <button class="lang-btn" data-lang="ar">
-                        <i class="fas fa-globe"></i> عربي
-                    </button>
-
-                </div>
+                <button class="lang-btn" data-lang="ar">
+                    <i class="fas fa-globe"></i> عربي
+                </button>
 
             </div>
 
-        </header>
+        </div>
 
+    </header>
 
-        <div class="admin-content">
 
-            <!-- Add/Edit Channel Form -->
-            <div class="admin-card">
+    <div class="admin-content">
 
-                <h2 id="formTitle">
-                    <i class="fas fa-plus-circle"></i>
-                    <span data-i18n="addChannel">Add New Channel</span>
-                </h2>
+        <!-- ADD / EDIT FORM -->
+        <div class="admin-card">
 
-                <form id="channelForm">
+            <h2 id="formTitle">
+                <i class="fas fa-plus-circle"></i>
+                <span data-i18n="addChannel">Add New Channel</span>
+            </h2>
 
-                    <input type="hidden" id="editChannelId">
+            <form id="channelForm">
 
-                    <div class="form-group">
+                <input type="hidden" id="editChannelId">
 
-                        <label data-i18n="channelNameLabel">
-                            Channel Name *
-                        </label>
+                <div class="form-group">
 
-                        <input
-                            type="text"
-                            id="channelName"
-                            required
-                            data-i18n-placeholder="channelNamePlaceholder"
-                            placeholder="e.g., ESPN HD"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label data-i18n="streamTypeLabel">
-                            Stream Type *
-                        </label>
-
-                        <select id="streamType" required>
-
-                            <option value="" data-i18n="selectStreamType">
-                                Select Stream Type
-                            </option>
-
-                            <option value="m3u8">
-                                M3U8/HLS Stream
-                            </option>
-
-                            <option value="youtube">
-                                YouTube Live
-                            </option>
-
-                            <option value="mp4">
-                                Direct MP4 Link
-                            </option>
-
-                            <option value="embed">
-                                Embed URL
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label data-i18n="streamURLLabel">
-                            Stream URL *
-                        </label>
-
-                        <input
-                            type="url"
-                            id="channelUrl"
-                            required
-                            data-i18n-placeholder="streamURLPlaceholder"
-                            placeholder="Enter stream URL"
-                        >
-
-                        <small class="help-text" id="urlHelp">
-
-                            <i class="fas fa-info-circle"></i>
-
-                            <span data-i18n="urlHelpText">
-                                Select stream type to see URL format
-                            </span>
-
-                        </small>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label data-i18n="channelLogoLabel">
-                            Channel Logo URL
-                        </label>
-
-                        <input
-                            type="url"
-                            id="channelLogo"
-                            placeholder="https://example.com/logo.png"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label data-i18n="categoryLabel">
-                            Category *
-                        </label>
-
-                        <select id="channelCategory" required>
-
-                            <option value="" data-i18n="selectCategory">
-                                Select Category
-                            </option>
-
-                            <option value="sports" data-i18n="sports">
-                                Sports
-                            </option>
-
-                            <option value="news" data-i18n="news">
-                                News
-                            </option>
-
-                            <option value="entertainment" data-i18n="entertainment">
-                                Entertainment
-                            </option>
-
-                            <option value="movies" data-i18n="movies">
-                                Movies
-                            </option>
-
-                            <option value="music" data-i18n="music">
-                                Music
-                            </option>
-
-                            <option value="kids" data-i18n="kids">
-                                Kids
-                            </option>
-
-                            <option value="documentary" data-i18n="documentary">
-                                Documentary
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label data-i18n="descriptionLabel">
-                            Description
-                        </label>
-
-                        <textarea
-                            id="channelDesc"
-                            rows="3"
-                            data-i18n-placeholder="descPlaceholder"
-                            placeholder="Channel description..."
-                        ></textarea>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label class="checkbox-label">
-
-                            <input
-                                type="checkbox"
-                                id="channelActive"
-                                checked
-                            >
-
-                            <span data-i18n="activeChannel">
-                                Active (Channel visible to users)
-                            </span>
-
-                        </label>
-
-                    </div>
-
-
-                    <div class="form-actions">
-
-                        <button
-                            type="submit"
-                            class="btn-primary"
-                            id="submitBtn"
-                        >
-
-                            <i class="fas fa-plus"></i>
-
-                            <span data-i18n="addChannelBtn">
-                                Add Channel
-                            </span>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="btn-secondary"
-                            id="cancelEdit"
-                            style="display:none;"
-                        >
-
-                            <i class="fas fa-times"></i>
-
-                            <span data-i18n="cancel">
-                                Cancel
-                            </span>
-
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-
-            <!-- Channels List -->
-            <div class="admin-card">
-
-                <div class="card-header">
-
-                    <h2>
-
-                        <i class="fas fa-list"></i>
-
-                        <span data-i18n="manageChannels">
-                            Manage Channels
-                        </span>
-
-                    </h2>
-
-
-                    <div class="stats">
-
-                        <span class="stat-item">
-
-                            <i class="fas fa-tv"></i>
-
-                            <span data-i18n="total">
-                                Total:
-                            </span>
-
-                            <strong id="totalChannels">
-                                0
-                            </strong>
-
-                        </span>
-
-
-                        <span class="stat-item">
-
-                            <i class="fas fa-check-circle"></i>
-
-                            <span data-i18n="active">
-                                Active:
-                            </span>
-
-                            <strong id="activeChannels">
-                                0
-                            </strong>
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div class="filter-bar">
+                    <label data-i18n="channelNameLabel">
+                        Channel Name *
+                    </label>
 
                     <input
                         type="text"
-                        id="adminSearch"
-                        data-i18n-placeholder="searchPlaceholder"
-                        placeholder="Search channels..."
-                        class="search-input"
+                        id="channelName"
+                        required
+                        data-i18n-placeholder="channelNamePlaceholder"
+                        placeholder="e.g., ESPN HD"
                     >
 
+                </div>
 
-                    <select
-                        id="filterCategory"
-                        class="filter-select"
+
+                <div class="form-group">
+
+                    <label data-i18n="streamTypeLabel">
+                        Stream Type *
+                    </label>
+
+                    <select id="streamType" required>
+
+                        <option value="" data-i18n="selectStreamType">
+                            Select Stream Type
+                        </option>
+
+                        <option value="m3u8">
+                            M3U8/HLS Stream
+                        </option>
+
+                        <option value="youtube">
+                            YouTube Live
+                        </option>
+
+                        <option value="mp4">
+                            Direct MP4 Link
+                        </option>
+
+                        <option value="embed">
+                            Embed URL
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label data-i18n="streamURLLabel">
+                        Stream URL *
+                    </label>
+
+                    <input
+                        type="url"
+                        id="channelUrl"
+                        required
+                        data-i18n-placeholder="streamURLPlaceholder"
+                        placeholder="Enter stream URL"
                     >
 
-                        <option value="" data-i18n="allCategories">
-                            All Categories
+                    <small class="help-text" id="urlHelp">
+
+                        <i class="fas fa-info-circle"></i>
+
+                        <span data-i18n="urlHelpText">
+                            Select stream type to see URL format
+                        </span>
+
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label data-i18n="channelLogoLabel">
+                        Channel Logo URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="channelLogo"
+                        placeholder="https://example.com/logo.png"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label data-i18n="categoryLabel">
+                        Category *
+                    </label>
+
+                    <select id="channelCategory" required>
+
+                        <option value="" data-i18n="selectCategory">
+                            Select Category
                         </option>
 
                         <option value="sports" data-i18n="sports">
@@ -403,271 +226,439 @@
                 </div>
 
 
-                <div
-                    class="channels-list"
-                    id="channelsList"
-                ></div>
+                <div class="form-group">
+
+                    <label data-i18n="descriptionLabel">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="channelDesc"
+                        rows="3"
+                        data-i18n-placeholder="descPlaceholder"
+                        placeholder="Channel description..."
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label class="checkbox-label">
+
+                        <input
+                            type="checkbox"
+                            id="channelActive"
+                            checked
+                        >
+
+                        <span data-i18n="activeChannel">
+                            Active (Channel visible to users)
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                        id="submitBtn"
+                    >
+
+                        <i class="fas fa-plus"></i>
+
+                        <span data-i18n="addChannelBtn">
+                            Add Channel
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        id="cancelEdit"
+                        style="display:none;"
+                    >
+
+                        <i class="fas fa-times"></i>
+
+                        <span data-i18n="cancel">
+                            Cancel
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- CHANNEL LIST -->
+        <div class="admin-card">
+
+            <div class="card-header">
+
+                <h2>
+                    <i class="fas fa-list"></i>
+
+                    <span data-i18n="manageChannels">
+                        Manage Channels
+                    </span>
+                </h2>
+
+
+                <div class="stats">
+
+                    <span class="stat-item">
+
+                        <i class="fas fa-tv"></i>
+
+                        <span data-i18n="total">
+                            Total:
+                        </span>
+
+                        <strong id="totalChannels">
+                            0
+                        </strong>
+
+                    </span>
+
+
+                    <span class="stat-item">
+
+                        <i class="fas fa-check-circle"></i>
+
+                        <span data-i18n="active">
+                            Active:
+                        </span>
+
+                        <strong id="activeChannels">
+                            0
+                        </strong>
+
+                    </span>
+
+                </div>
 
             </div>
+
+
+            <div class="filter-bar">
+
+                <input
+                    type="text"
+                    id="adminSearch"
+                    data-i18n-placeholder="searchPlaceholder"
+                    placeholder="Search channels..."
+                    class="search-input"
+                >
+
+
+                <select
+                    id="filterCategory"
+                    class="filter-select"
+                >
+
+                    <option value="" data-i18n="allCategories">
+                        All Categories
+                    </option>
+
+                    <option value="sports" data-i18n="sports">
+                        Sports
+                    </option>
+
+                    <option value="news" data-i18n="news">
+                        News
+                    </option>
+
+                    <option value="entertainment" data-i18n="entertainment">
+                        Entertainment
+                    </option>
+
+                    <option value="movies" data-i18n="movies">
+                        Movies
+                    </option>
+
+                    <option value="music" data-i18n="music">
+                        Music
+                    </option>
+
+                    <option value="kids" data-i18n="kids">
+                        Kids
+                    </option>
+
+                    <option value="documentary" data-i18n="documentary">
+                        Documentary
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div
+                class="channels-list"
+                id="channelsList"
+            ></div>
 
         </div>
 
     </div>
 
+</div>
+
 
 <script>
 
-    /* =========================================================
-       TRANSLATIONS
-    ========================================================= */
+/* =========================================================
+   TRANSLATIONS
+========================================================= */
 
-    const translations = {
+const translations = {
 
-        en: {
+    en: {
 
-            adminPanelTitle: "Admin Panel - StreamHub",
+        adminPanelTitle: "Admin Panel - StreamHub",
+        adminPanel: "Admin Panel",
+        welcomeMsg: "Welcome,",
+        backToSite: "Back to Site",
+        logout: "Logout",
 
-            adminPanel: "Admin Panel",
+        addChannel: "Add New Channel",
+        channelNameLabel: "Channel Name *",
+        channelNamePlaceholder: "e.g., ESPN HD",
 
-            welcomeMsg: "Welcome,",
+        streamTypeLabel: "Stream Type *",
+        selectStreamType: "Select Stream Type",
 
-            backToSite: "Back to Site",
+        streamURLLabel: "Stream URL *",
+        streamURLPlaceholder: "Enter stream URL",
 
-            logout: "Logout",
+        channelLogoLabel: "Channel Logo URL",
 
-            addChannel: "Add New Channel",
+        categoryLabel: "Category *",
+        selectCategory: "Select Category",
 
-            channelNameLabel: "Channel Name *",
+        descriptionLabel: "Description",
+        descPlaceholder: "Channel description...",
 
-            channelNamePlaceholder: "e.g., ESPN HD",
+        activeChannel: "Active (Channel visible to users)",
 
-            streamTypeLabel: "Stream Type *",
+        addChannelBtn: "Add Channel",
+        cancel: "Cancel",
 
-            selectStreamType: "Select Stream Type",
+        manageChannels: "Manage Channels",
+        total: "Total:",
+        active: "Active:",
 
-            streamURLLabel: "Stream URL *",
+        allCategories: "All Categories",
 
-            streamURLPlaceholder: "Enter stream URL",
+        sports: "Sports",
+        news: "News",
+        entertainment: "Entertainment",
+        movies: "Movies",
+        music: "Music",
+        kids: "Kids",
+        documentary: "Documentary",
 
-            channelLogoLabel: "Channel Logo URL",
+        searchPlaceholder: "Search channels...",
 
-            categoryLabel: "Category *",
+        editChannel: "Edit Channel",
+        updateChannel: "Update Channel",
 
-            selectCategory: "Select Category",
+        deleteConfirm:
+            "Are you sure you want to delete this channel?",
 
-            descriptionLabel: "Description",
+        logoutConfirm:
+            "Are you sure you want to logout?",
 
-            descPlaceholder: "Channel description...",
+        channelAdded:
+            "Channel added successfully!",
 
-            activeChannel: "Active (Channel visible to users)",
+        channelUpdated:
+            "Channel updated successfully!",
 
-            addChannelBtn: "Add Channel",
+        channelDeleted:
+            "Channel deleted successfully!",
 
-            cancel: "Cancel",
+        fillAllFields:
+            "Please fill in all required fields!",
 
-            manageChannels: "Manage Channels",
+        noChannels:
+            "No channels found.",
 
-            total: "Total:",
+        noDescription:
+            "No description",
 
-            active: "Active:",
+        loading:
+            "Loading channels...",
 
-            allCategories: "All Categories",
+        authError:
+            "You must be logged in as an administrator.",
 
-            sports: "Sports",
+        urlHelpText:
+            "Select stream type to see URL format"
 
-            news: "News",
+    },
 
-            entertainment: "Entertainment",
 
-            movies: "Movies",
+    ar: {
 
-            music: "Music",
+        adminPanelTitle: "لوحة التحكم - ستريم هاب",
+        adminPanel: "لوحة التحكم",
+        welcomeMsg: "مرحباً،",
+        backToSite: "العودة للموقع",
+        logout: "تسجيل الخروج",
 
-            kids: "Kids",
+        addChannel: "إضافة قناة جديدة",
+        channelNameLabel: "اسم القناة *",
+        channelNamePlaceholder: "مثال: ESPN HD",
 
-            documentary: "Documentary",
+        streamTypeLabel: "نوع البث *",
+        selectStreamType: "اختر نوع البث",
 
-            searchPlaceholder: "Search channels...",
+        streamURLLabel: "رابط البث *",
+        streamURLPlaceholder: "أدخل رابط البث",
 
-            editChannel: "Edit Channel",
+        channelLogoLabel: "رابط شعار القناة",
 
-            updateChannel: "Update Channel",
+        categoryLabel: "الفئة *",
+        selectCategory: "اختر الفئة",
 
-            deleteConfirm: "Are you sure you want to delete this channel?",
+        descriptionLabel: "الوصف",
+        descPlaceholder: "وصف القناة...",
 
-            logoutConfirm: "Are you sure you want to logout?",
+        activeChannel:
+            "نشط (القناة مرئية للمستخدمين)",
 
-            channelAdded: "Channel added successfully!",
+        addChannelBtn: "إضافة قناة",
+        cancel: "إلغاء",
 
-            channelUpdated: "Channel updated successfully!",
+        manageChannels: "إدارة القنوات",
+        total: "الإجمالي:",
+        active: "نشط:",
 
-            channelDeleted: "Channel deleted successfully!",
+        allCategories: "جميع الفئات",
 
-            fillAllFields: "Please fill in all required fields!",
+        sports: "رياضة",
+        news: "أخبار",
+        entertainment: "ترفيه",
+        movies: "أفلام",
+        music: "موسيقى",
+        kids: "أطفال",
+        documentary: "وثائقي",
 
-            noChannels: "No channels found.",
+        searchPlaceholder:
+            "ابحث عن القنوات...",
 
-            noDescription: "No description",
+        editChannel:
+            "تعديل القناة",
 
-            loading: "Loading channels...",
+        updateChannel:
+            "تحديث القناة",
 
-            authError: "You must be logged in as an administrator.",
+        deleteConfirm:
+            "هل أنت متأكد من حذف هذه القناة؟",
 
-            urlHelpText: "Select stream type to see URL format"
+        logoutConfirm:
+            "هل أنت متأكد من تسجيل الخروج؟",
 
-        },
+        channelAdded:
+            "تمت إضافة القناة بنجاح!",
 
+        channelUpdated:
+            "تم تحديث القناة بنجاح!",
 
-        ar: {
+        channelDeleted:
+            "تم حذف القناة بنجاح!",
 
-            adminPanelTitle: "لوحة التحكم - ستريم هاب",
+        fillAllFields:
+            "الرجاء ملء جميع الحقول المطلوبة!",
 
-            adminPanel: "لوحة التحكم",
+        noChannels:
+            "لا توجد قنوات.",
 
-            welcomeMsg: "مرحباً،",
+        noDescription:
+            "لا يوجد وصف",
 
-            backToSite: "العودة للموقع",
+        loading:
+            "جارٍ تحميل القنوات...",
 
-            logout: "تسجيل الخروج",
+        authError:
+            "يجب تسجيل الدخول كمسؤول.",
 
-            addChannel: "إضافة قناة جديدة",
+        urlHelpText:
+            "اختر نوع البث لمعرفة صيغة الرابط"
 
-            channelNameLabel: "اسم القناة *",
-
-            channelNamePlaceholder: "مثال: ESPN HD",
-
-            streamTypeLabel: "نوع البث *",
-
-            selectStreamType: "اختر نوع البث",
-
-            streamURLLabel: "رابط البث *",
-
-            streamURLPlaceholder: "أدخل رابط البث",
-
-            channelLogoLabel: "رابط شعار القناة",
-
-            categoryLabel: "الفئة *",
-
-            selectCategory: "اختر الفئة",
-
-            descriptionLabel: "الوصف",
-
-            descPlaceholder: "وصف القناة...",
-
-            activeChannel: "نشط (القناة مرئية للمستخدمين)",
-
-            addChannelBtn: "إضافة قناة",
-
-            cancel: "إلغاء",
-
-            manageChannels: "إدارة القنوات",
-
-            total: "الإجمالي:",
-
-            active: "نشط:",
-
-            allCategories: "جميع الفئات",
-
-            sports: "رياضة",
-
-            news: "أخبار",
-
-            entertainment: "ترفيه",
-
-            movies: "أفلام",
-
-            music: "موسيقى",
-
-            kids: "أطفال",
-
-            documentary: "وثائقي",
-
-            searchPlaceholder: "ابحث عن القنوات...",
-
-            editChannel: "تعديل القناة",
-
-            updateChannel: "تحديث القناة",
-
-            deleteConfirm: "هل أنت متأكد من حذف هذه القناة؟",
-
-            logoutConfirm: "هل أنت متأكد من تسجيل الخروج؟",
-
-            channelAdded: "تمت إضافة القناة بنجاح!",
-
-            channelUpdated: "تم تحديث القناة بنجاح!",
-
-            channelDeleted: "تم حذف القناة بنجاح!",
-
-            fillAllFields: "الرجاء ملء جميع الحقول المطلوبة!",
-
-            noChannels: "لا توجد قنوات.",
-
-            noDescription: "لا يوجد وصف",
-
-            loading: "جارٍ تحميل القنوات...",
-
-            authError: "يجب تسجيل الدخول كمسؤول.",
-
-            urlHelpText: "اختر نوع البث لمعرفة صيغة الرابط"
-
-        }
-
-    };
-
-
-    /* =========================================================
-       SUPABASE AUTHENTICATION
-    ========================================================= */
-
-    async function checkAdminAuth() {
-
-        const {
-            data: { session },
-            error
-        } = await supabaseClient.auth.getSession();
-
-        if (error || !session) {
-
-            window.location.href = "login.html";
-
-            return false;
-        }
-
-        document.getElementById("adminEmail").textContent =
-            session.user.email || "Admin";
-
-        return true;
     }
 
+};
 
-    /* =========================================================
-       LANGUAGE
-    ========================================================= */
 
-    function getCurrentLanguage() {
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
 
-        return localStorage.getItem("language") || "en";
+async function checkAdminAuth() {
+
+    const {
+        data: { session },
+        error
+    } = await supabaseClient.auth.getSession();
+
+    if (error || !session) {
+
+        window.location.href = "login.html";
+
+        return false;
     }
 
+    document.getElementById("adminEmail").textContent =
+        session.user.email || "Admin";
 
-    function setCurrentLanguage(lang) {
-
-        localStorage.setItem("language", lang);
-
-        updateLanguage();
-    }
+    return true;
+}
 
 
-    function updateLanguage() {
+/* =========================================================
+   LANGUAGE
+========================================================= */
 
-        const lang = getCurrentLanguage();
+function getCurrentLanguage() {
 
-        document.querySelectorAll("[data-i18n]").forEach(el => {
+    return localStorage.getItem("language") || "en";
+}
 
-            const key = el.getAttribute("data-i18n");
 
-            if (translations[lang] &&
-                translations[lang][key]) {
+function setCurrentLanguage(lang) {
+
+    localStorage.setItem("language", lang);
+
+    updateLanguage();
+}
+
+
+function updateLanguage() {
+
+    const lang = getCurrentLanguage();
+
+    document.querySelectorAll("[data-i18n]")
+        .forEach(el => {
+
+            const key =
+                el.getAttribute("data-i18n");
+
+            if (
+                translations[lang] &&
+                translations[lang][key]
+            ) {
 
                 el.textContent =
                     translations[lang][key];
@@ -676,98 +667,109 @@
         });
 
 
-        document.querySelectorAll(
-            "[data-i18n-placeholder]"
-        ).forEach(el => {
+    document.querySelectorAll(
+        "[data-i18n-placeholder]"
+    ).forEach(el => {
 
-            const key =
-                el.getAttribute(
-                    "data-i18n-placeholder"
-                );
+        const key =
+            el.getAttribute(
+                "data-i18n-placeholder"
+            );
 
-            if (translations[lang] &&
-                translations[lang][key]) {
+        if (
+            translations[lang] &&
+            translations[lang][key]
+        ) {
 
-                el.placeholder =
-                    translations[lang][key];
-            }
+            el.placeholder =
+                translations[lang][key];
+        }
+
+    });
+
+
+    document.title =
+        translations[lang].adminPanelTitle;
+
+
+    document.documentElement.lang =
+        lang;
+
+    document.documentElement.dir =
+        lang === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    document.querySelectorAll(".lang-btn")
+        .forEach(btn => {
+
+            btn.classList.toggle(
+                "active",
+                btn.getAttribute("data-lang") === lang
+            );
 
         });
 
-
-        document.title =
-            translations[lang].adminPanelTitle;
+}
 
 
-        document.documentElement.lang = lang;
+/* =========================================================
+   CHANNELS
+========================================================= */
 
-        document.documentElement.dir =
-            lang === "ar" ? "rtl" : "ltr";
-
-
-        document.querySelectorAll(".lang-btn")
-            .forEach(btn => {
-
-                btn.classList.toggle(
-                    "active",
-                    btn.getAttribute("data-lang") === lang
-                );
-
-            });
-
-    }
+let channels = [];
 
 
-    /* =========================================================
-       LOAD CHANNELS FROM SUPABASE
-    ========================================================= */
+async function loadChannels() {
 
-    let channels = [];
+    const channelsList =
+        document.getElementById(
+            "channelsList"
+        );
+
+    const lang =
+        getCurrentLanguage();
+
+    channelsList.innerHTML =
+        `<p class="no-data">
+            ${translations[lang].loading}
+        </p>`;
 
 
-    async function loadChannels() {
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("channels")
+        .select("*")
+        .order("id", {
+            ascending: true
+        });
 
-        const channelsList =
-            document.getElementById("channelsList");
+
+    if (error) {
+
+        console.error(
+            "Error loading channels:",
+            error
+        );
+
+        channels = [];
 
         channelsList.innerHTML =
             `<p class="no-data">
-                ${translations[getCurrentLanguage()].loading}
+                ${error.message}
             </p>`;
 
+        updateStats();
 
-        const {
-            data,
-            error
-        } = await supabaseClient
-            .from("channels")
-            .select("*")
-            .order("id", {
-                ascending: true
-            });
+        return;
+    }
 
 
-        if (error) {
-
-            console.error(
-                "Error loading channels:",
-                error
-            );
-
-            channels = [];
-
-            channelsList.innerHTML =
-                `<p class="no-data">
-                    ${error.message}
-                </p>`;
-
-            updateStats();
-
-            return;
-        }
-
-
-        channels = (data || []).map(channel => ({
+    channels =
+        (data || []).map(channel => ({
 
             id: channel.id,
 
@@ -779,7 +781,8 @@
 
             category: channel.category || "",
 
-            description: channel.description || "",
+            description:
+                channel.description || "",
 
             streamType:
                 channel.stream_type || "",
@@ -790,42 +793,34 @@
         }));
 
 
-        updateStats();
+    updateStats();
 
-        displayAdminChannels();
+    displayAdminChannels();
 
-    }
-
-
-    /* =========================================================
-       STATISTICS
-    ========================================================= */
-
-    function updateStats() {
-
-        document.getElementById(
-            "totalChannels"
-        ).textContent = channels.length;
+}
 
 
-        const activeCount =
-            channels.filter(
-                ch => ch.active !== false
-            ).length;
+/* =========================================================
+   ADD / UPDATE CHANNEL
+========================================================= */
+
+document.getElementById(
+    "channelForm"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const lang =
+            getCurrentLanguage();
 
 
-        document.getElementById(
-            "activeChannels"
-        ).textContent = activeCount;
+        const name =
+            document.getElementById(
+                "channelName"
+            ).value.trim();
 
-    }
-
-
-    /* =========================================================
-       URL HELP
-    ========================================================= */
-
-    function updateUrlHelp() {
 
         const streamType =
             document.getElementById(
@@ -833,130 +828,211 @@
             ).value;
 
 
-        const urlHelp =
+        const url =
             document.getElementById(
-                "urlHelp"
+                "channelUrl"
+            ).value.trim();
+
+
+        const logo =
+            document.getElementById(
+                "channelLogo"
+            ).value.trim();
+
+
+        const category =
+            document.getElementById(
+                "channelCategory"
+            ).value;
+
+
+        const description =
+            document.getElementById(
+                "channelDesc"
+            ).value.trim();
+
+
+        const active =
+            document.getElementById(
+                "channelActive"
+            ).checked;
+
+
+        if (
+            !name ||
+            !streamType ||
+            !url ||
+            !category
+        ) {
+
+            alert(
+                translations[lang].fillAllFields
+            );
+
+            return;
+        }
+
+
+        const editId =
+            document.getElementById(
+                "editChannelId"
+            ).value;
+
+
+        const submitBtn =
+            document.getElementById(
+                "submitBtn"
             );
 
 
-        const lang =
-            getCurrentLanguage();
+        submitBtn.disabled = true;
 
 
-        const helpTexts = {
+        try {
 
-            en: {
+            /* ============================
+               UPDATE EXISTING CHANNEL
+            ============================ */
 
-                m3u8:
-                    "Enter M3U8/HLS stream URL (e.g., https://example.com/stream.m3u8)",
+            if (editId) {
 
-                youtube:
-                    "Enter YouTube video or live stream URL (e.g., https://youtube.com/watch?v=...)",
+                const {
+                    error
+                } = await supabaseClient
+                    .from("channels")
+                    .update({
 
-                mp4:
-                    "Enter direct MP4 video URL (e.g., https://example.com/video.mp4)",
+                        name: name,
 
-                embed:
-                    "Enter embed URL or iframe source URL"
+                        url: url,
 
-            },
+                        logo: logo,
+
+                        category: category,
+
+                        description: description,
+
+                        stream_type: streamType,
+
+                        active: active
+
+                    })
+                    .eq(
+                        "id",
+                        editId
+                    );
 
 
-            ar: {
+                if (error) {
 
-                m3u8:
-                    "أدخل رابط بث M3U8/HLS",
+                    console.error(
+                        "Update error:",
+                        error
+                    );
 
-                youtube:
-                    "أدخل رابط فيديو أو بث مباشر من يوتيوب",
+                    alert(
+                        "Error updating channel:\n" +
+                        error.message
+                    );
 
-                mp4:
-                    "أدخل رابط فيديو MP4 مباشر",
+                    return;
+                }
 
-                embed:
-                    "أدخل رابط التضمين أو مصدر iframe"
+
+                alert(
+                    translations[lang]
+                        .channelUpdated
+                );
 
             }
 
-        };
+            /* ============================
+               ADD NEW CHANNEL
+            ============================ */
+
+            else {
+
+                /*
+                 * We generate the ID here because
+                 * your current database ID column
+                 * is an int8 primary key.
+                 */
+
+                const newId =
+                    Date.now();
 
 
-        const text =
-            helpTexts[lang] &&
-            helpTexts[lang][streamType]
-                ? helpTexts[lang][streamType]
-                : translations[lang].urlHelpText;
+                const {
+                    error
+                } = await supabaseClient
+                    .from("channels")
+                    .insert({
+
+                        id: newId,
+
+                        name: name,
+
+                        url: url,
+
+                        logo: logo,
+
+                        category: category,
+
+                        description: description,
+
+                        stream_type: streamType,
+
+                        active: active
+
+                    });
 
 
-        urlHelp.innerHTML =
-            `<i class="fas fa-info-circle"></i> ${text}`;
+                if (error) {
+
+                    console.error(
+                        "Insert error:",
+                        error
+                    );
+
+                    alert(
+                        "Error adding channel:\n" +
+                        error.message
+                    );
+
+                    return;
+                }
+
+
+                alert(
+                    translations[lang]
+                        .channelAdded
+                );
+
+            }
+
+
+            resetForm();
+
+            await loadChannels();
+
+        }
+
+        finally {
+
+            submitBtn.disabled = false;
+
+        }
 
     }
+);
 
 
-    document.getElementById(
-        "streamType"
-    ).addEventListener(
-        "change",
-        updateUrlHelp
-    );
+/* =========================================================
+   DELETE CHANNEL
+========================================================= */
 
-
-    /* =========================================================
-       RESET FORM
-    ========================================================= */
-
-    function resetForm() {
-
-        const lang =
-            getCurrentLanguage();
-
-
-        document.getElementById(
-            "channelForm"
-        ).reset();
-
-
-        document.getElementById(
-            "editChannelId"
-        ).value = "";
-
-
-        document.getElementById(
-            "formTitle"
-        ).innerHTML =
-            `<i class="fas fa-plus-circle"></i>
-             <span>${translations[lang].addChannel}</span>`;
-
-
-        document.getElementById(
-            "submitBtn"
-        ).innerHTML =
-            `<i class="fas fa-plus"></i>
-             <span>${translations[lang].addChannelBtn}</span>`;
-
-
-        document.getElementById(
-            "cancelEdit"
-        ).style.display =
-            "none";
-
-    }
-
-
-    document.getElementById(
-        "cancelEdit"
-    ).addEventListener(
-        "click",
-        resetForm
-    );
-
-
-    /* =========================================================
-       EDIT CHANNEL
-    ========================================================= */
-
-    window.editChannel = function(id) {
+window.deleteChannel =
+    async function(id) {
 
         const lang =
             getCurrentLanguage();
@@ -964,46 +1040,295 @@
 
         const channel =
             channels.find(
-                ch => ch.id === id
+                ch => String(ch.id) === String(id)
             );
 
 
-        if (!channel) return;
+        if (!channel) {
+
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                translations[lang]
+                    .deleteConfirm
+            );
+
+
+        if (!confirmed) {
+
+            return;
+        }
+
+
+        const {
+            error
+        } = await supabaseClient
+            .from("channels")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Delete error:",
+                error
+            );
+
+            alert(
+                "Error deleting channel:\n" +
+                error.message
+            );
+
+            return;
+        }
+
+
+        alert(
+            translations[lang]
+                .channelDeleted
+        );
+
+
+        await loadChannels();
+
+    };
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStats() {
+
+    document.getElementById(
+        "totalChannels"
+    ).textContent =
+        channels.length;
+
+
+    const activeCount =
+        channels.filter(
+            ch => ch.active !== false
+        ).length;
+
+
+    document.getElementById(
+        "activeChannels"
+    ).textContent =
+        activeCount;
+
+}
+
+
+/* =========================================================
+   URL HELP
+========================================================= */
+
+function updateUrlHelp() {
+
+    const streamType =
+        document.getElementById(
+            "streamType"
+        ).value;
+
+
+    const urlHelp =
+        document.getElementById(
+            "urlHelp"
+        );
+
+
+    const lang =
+        getCurrentLanguage();
+
+
+    const helpTexts = {
+
+        en: {
+
+            m3u8:
+                "Enter M3U8/HLS stream URL (e.g., https://example.com/stream.m3u8)",
+
+            youtube:
+                "Enter YouTube video or live stream URL (e.g., https://youtube.com/watch?v=...)",
+
+            mp4:
+                "Enter direct MP4 video URL (e.g., https://example.com/video.mp4)",
+
+            embed:
+                "Enter embed URL or iframe source URL"
+
+        },
+
+
+        ar: {
+
+            m3u8:
+                "أدخل رابط بث M3U8/HLS",
+
+            youtube:
+                "أدخل رابط فيديو أو بث مباشر من يوتيوب",
+
+            mp4:
+                "أدخل رابط فيديو MP4 مباشر",
+
+            embed:
+                "أدخل رابط التضمين أو مصدر iframe"
+
+        }
+
+    };
+
+
+    const text =
+        helpTexts[lang] &&
+        helpTexts[lang][streamType]
+            ? helpTexts[lang][streamType]
+            : translations[lang].urlHelpText;
+
+
+    urlHelp.innerHTML =
+        `<i class="fas fa-info-circle"></i> ${text}`;
+
+}
+
+
+document.getElementById(
+    "streamType"
+).addEventListener(
+    "change",
+    updateUrlHelp
+);
+
+
+/* =========================================================
+   RESET FORM
+========================================================= */
+
+function resetForm() {
+
+    const lang =
+        getCurrentLanguage();
+
+
+    document.getElementById(
+        "channelForm"
+    ).reset();
+
+
+    document.getElementById(
+        "editChannelId"
+    ).value = "";
+
+
+    document.getElementById(
+        "channelActive"
+    ).checked = true;
+
+
+    document.getElementById(
+        "formTitle"
+    ).innerHTML =
+        `<i class="fas fa-plus-circle"></i>
+         <span>${translations[lang].addChannel}</span>`;
+
+
+    document.getElementById(
+        "submitBtn"
+    ).innerHTML =
+        `<i class="fas fa-plus"></i>
+         <span>${translations[lang].addChannelBtn}</span>`;
+
+
+    document.getElementById(
+        "cancelEdit"
+    ).style.display =
+        "none";
+
+
+    updateUrlHelp();
+
+}
+
+
+document.getElementById(
+    "cancelEdit"
+).addEventListener(
+    "click",
+    resetForm
+);
+
+
+/* =========================================================
+   EDIT CHANNEL
+========================================================= */
+
+window.editChannel =
+    function(id) {
+
+        const lang =
+            getCurrentLanguage();
+
+
+        const channel =
+            channels.find(
+                ch => String(ch.id) === String(id)
+            );
+
+
+        if (!channel) {
+
+            return;
+        }
 
 
         document.getElementById(
             "editChannelId"
-        ).value = channel.id;
+        ).value =
+            channel.id;
 
 
         document.getElementById(
             "channelName"
-        ).value = channel.name;
+        ).value =
+            channel.name;
 
 
         document.getElementById(
             "channelUrl"
-        ).value = channel.url;
+        ).value =
+            channel.url;
 
 
         document.getElementById(
             "channelLogo"
-        ).value = channel.logo || "";
+        ).value =
+            channel.logo || "";
 
 
         document.getElementById(
             "channelCategory"
-        ).value = channel.category;
+        ).value =
+            channel.category;
 
 
         document.getElementById(
             "channelDesc"
-        ).value = channel.description || "";
+        ).value =
+            channel.description || "";
 
 
         document.getElementById(
             "streamType"
-        ).value = channel.streamType;
+        ).value =
+            channel.streamType;
 
 
         document.getElementById(
@@ -1044,368 +1369,387 @@
     };
 
 
-    /* =========================================================
-       DISPLAY CHANNELS
-    ========================================================= */
+/* =========================================================
+   DISPLAY CHANNELS
+========================================================= */
 
-    function displayAdminChannels(
-        filterCategory = "",
-        searchQuery = ""
+function displayAdminChannels(
+    filterCategory = "",
+    searchQuery = ""
+) {
+
+    const lang =
+        getCurrentLanguage();
+
+
+    const channelsList =
+        document.getElementById(
+            "channelsList"
+        );
+
+
+    let filteredChannels =
+        [...channels];
+
+
+    if (filterCategory) {
+
+        filteredChannels =
+            filteredChannels.filter(
+                ch =>
+                    ch.category ===
+                    filterCategory
+            );
+
+    }
+
+
+    if (searchQuery) {
+
+        const query =
+            searchQuery.toLowerCase();
+
+
+        filteredChannels =
+            filteredChannels.filter(
+                ch =>
+
+                    ch.name
+                        .toLowerCase()
+                        .includes(query)
+
+                    ||
+
+                    (
+                        ch.description &&
+                        ch.description
+                            .toLowerCase()
+                            .includes(query)
+                    )
+
+            );
+
+    }
+
+
+    if (
+        filteredChannels.length === 0
     ) {
+
+        channelsList.innerHTML =
+            `<p class="no-data">
+                ${translations[lang].noChannels}
+            </p>`;
+
+        return;
+    }
+
+
+    channelsList.innerHTML =
+        filteredChannels.map(
+            channel => `
+
+        <div class="channel-item ${
+            channel.active === false
+                ? "inactive"
+                : ""
+        }">
+
+            <div class="channel-item-logo">
+
+                ${
+                    channel.logo
+
+                    ?
+
+                    `<img
+                        src="${channel.logo}"
+                        alt="${channel.name}"
+                    >`
+
+                    :
+
+                    `<i class="fas fa-tv"></i>`
+                }
+
+            </div>
+
+
+            <div class="channel-item-info">
+
+                <h3>
+                    ${channel.name}
+                </h3>
+
+
+                <div class="channel-meta">
+
+                    <span class="meta-item">
+
+                        <i class="fas fa-folder"></i>
+
+                        ${
+                            translations[lang][
+                                channel.category
+                            ] ||
+                            channel.category
+                        }
+
+                    </span>
+
+
+                    <span class="meta-item">
+
+                        <i class="fas fa-broadcast-tower"></i>
+
+                        ${channel.streamType}
+
+                    </span>
+
+
+                    <span
+                        class="meta-item ${
+                            channel.active !== false
+                                ? "active"
+                                : "inactive"
+                        }"
+                    >
+
+                        <i class="fas fa-circle"></i>
+
+                        ${
+                            channel.active !== false
+
+                            ?
+
+                            (
+                                lang === "ar"
+                                    ? "نشط"
+                                    : "Active"
+                            )
+
+                            :
+
+                            (
+                                lang === "ar"
+                                    ? "غير نشط"
+                                    : "Inactive"
+                            )
+                        }
+
+                    </span>
+
+                </div>
+
+
+                <p>
+                    ${
+                        channel.description ||
+                        translations[lang].noDescription
+                    }
+                </p>
+
+            </div>
+
+
+            <div class="channel-item-actions">
+
+                <button
+                    class="btn-edit"
+                    onclick="editChannel(${channel.id})"
+                    title="${
+                        lang === "ar"
+                            ? "تعديل"
+                            : "Edit"
+                    }"
+                >
+
+                    <i class="fas fa-edit"></i>
+
+                </button>
+
+
+                <button
+                    class="btn-delete"
+                    onclick="deleteChannel(${channel.id})"
+                    title="${
+                        lang === "ar"
+                            ? "حذف"
+                            : "Delete"
+                    }"
+                >
+
+                    <i class="fas fa-trash"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `
+        ).join("");
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document.getElementById(
+    "adminSearch"
+).addEventListener(
+    "input",
+    function() {
+
+        const category =
+            document.getElementById(
+                "filterCategory"
+            ).value;
+
+
+        displayAdminChannels(
+            category,
+            this.value
+        );
+
+    }
+);
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+document.getElementById(
+    "filterCategory"
+).addEventListener(
+    "change",
+    function() {
+
+        const search =
+            document.getElementById(
+                "adminSearch"
+            ).value;
+
+
+        displayAdminChannels(
+            this.value,
+            search
+        );
+
+    }
+);
+
+
+/* =========================================================
+   LANGUAGE BUTTONS
+========================================================= */
+
+document.querySelectorAll(
+    ".lang-btn"
+).forEach(btn => {
+
+    btn.addEventListener(
+        "click",
+        function() {
+
+            setCurrentLanguage(
+                this.getAttribute(
+                    "data-lang"
+                )
+            );
+
+
+            displayAdminChannels();
+
+            updateUrlHelp();
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+document.getElementById(
+    "logoutBtn"
+).addEventListener(
+    "click",
+    async function() {
 
         const lang =
             getCurrentLanguage();
 
 
-        const channelsList =
-            document.getElementById(
-                "channelsList"
-            );
-
-
-        let filteredChannels =
-            [...channels];
-
-
-        if (filterCategory) {
-
-            filteredChannels =
-                filteredChannels.filter(
-                    ch =>
-                        ch.category ===
-                        filterCategory
-                );
-
-        }
-
-
-        if (searchQuery) {
-
-            const query =
-                searchQuery.toLowerCase();
-
-
-            filteredChannels =
-                filteredChannels.filter(
-                    ch =>
-                        ch.name
-                            .toLowerCase()
-                            .includes(query) ||
-
-                        (
-                            ch.description &&
-                            ch.description
-                                .toLowerCase()
-                                .includes(query)
-                        )
-                );
-
-        }
-
-
-        if (filteredChannels.length === 0) {
-
-            channelsList.innerHTML =
-                `<p class="no-data">
-                    ${translations[lang].noChannels}
-                </p>`;
+        if (
+            !confirm(
+                translations[lang]
+                    .logoutConfirm
+            )
+        ) {
 
             return;
         }
 
 
-        channelsList.innerHTML =
-            filteredChannels.map(channel => `
+        await supabaseClient.auth.signOut();
 
-                <div class="channel-item ${
-                    channel.active === false
-                        ? "inactive"
-                        : ""
-                }">
 
-                    <div class="channel-item-logo">
-
-                        ${
-                            channel.logo
-
-                            ?
-
-                            `<img
-                                src="${channel.logo}"
-                                alt="${channel.name}"
-                            >`
-
-                            :
-
-                            `<i class="fas fa-tv"></i>`
-                        }
-
-                    </div>
-
-
-                    <div class="channel-item-info">
-
-                        <h3>
-                            ${channel.name}
-                        </h3>
-
-
-                        <div class="channel-meta">
-
-                            <span class="meta-item">
-
-                                <i class="fas fa-folder"></i>
-
-                                ${
-                                    translations[lang][
-                                        channel.category
-                                    ] ||
-                                    channel.category
-                                }
-
-                            </span>
-
-
-                            <span class="meta-item">
-
-                                <i class="fas fa-broadcast-tower"></i>
-
-                                ${channel.streamType}
-
-                            </span>
-
-
-                            <span
-                                class="meta-item ${
-                                    channel.active !== false
-                                        ? "active"
-                                        : "inactive"
-                                }"
-                            >
-
-                                <i class="fas fa-circle"></i>
-
-                                ${
-                                    channel.active !== false
-
-                                    ?
-
-                                    (
-                                        lang === "ar"
-                                            ? "نشط"
-                                            : "Active"
-                                    )
-
-                                    :
-
-                                    (
-                                        lang === "ar"
-                                            ? "غير نشط"
-                                            : "Inactive"
-                                    )
-                                }
-
-                            </span>
-
-                        </div>
-
-
-                        <p>
-                            ${
-                                channel.description ||
-                                translations[lang].noDescription
-                            }
-                        </p>
-
-                    </div>
-
-
-                    <div class="channel-item-actions">
-
-                        <button
-                            class="btn-edit"
-                            onclick="editChannel(${channel.id})"
-                            title="${
-                                lang === "ar"
-                                    ? "تعديل"
-                                    : "Edit"
-                            }"
-                        >
-
-                            <i class="fas fa-edit"></i>
-
-                        </button>
-
-
-                        <button
-                            class="btn-delete"
-                            onclick="deleteChannel(${channel.id})"
-                            title="${
-                                lang === "ar"
-                                    ? "حذف"
-                                    : "Delete"
-                            }"
-                        >
-
-                            <i class="fas fa-trash"></i>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            `).join("");
-
-    }
-
-
-    /* =========================================================
-       SEARCH / FILTER
-    ========================================================= */
-
-    document.getElementById(
-        "adminSearch"
-    ).addEventListener(
-        "input",
-        function() {
-
-            const category =
-                document.getElementById(
-                    "filterCategory"
-                ).value;
-
-
-            displayAdminChannels(
-                category,
-                this.value
-            );
-
-        }
-    );
-
-
-    document.getElementById(
-        "filterCategory"
-    ).addEventListener(
-        "change",
-        function() {
-
-            const search =
-                document.getElementById(
-                    "adminSearch"
-                ).value;
-
-
-            displayAdminChannels(
-                this.value,
-                search
-            );
-
-        }
-    );
-
-
-    /* =========================================================
-       LANGUAGE BUTTONS
-    ========================================================= */
-
-    document.querySelectorAll(
-        ".lang-btn"
-    ).forEach(btn => {
-
-        btn.addEventListener(
-            "click",
-            function() {
-
-                setCurrentLanguage(
-                    this.getAttribute(
-                        "data-lang"
-                    )
-                );
-
-
-                displayAdminChannels();
-
-            }
+        localStorage.removeItem(
+            "adminLoggedIn"
         );
 
-    });
+        localStorage.removeItem(
+            "adminEmail"
+        );
+
+        sessionStorage.removeItem(
+            "adminLoggedIn"
+        );
+
+        sessionStorage.removeItem(
+            "adminEmail"
+        );
 
 
-    /* =========================================================
-       LOGOUT
-    ========================================================= */
+        window.location.href =
+            "login.html";
 
-    document.getElementById(
-        "logoutBtn"
-    ).addEventListener(
-        "click",
-        async function() {
-
-            const lang =
-                getCurrentLanguage();
+    }
+);
 
 
-            if (
-                !confirm(
-                    translations[lang].logoutConfirm
-                )
-            ) {
-                return;
-            }
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function initializeAdmin() {
+
+    const authenticated =
+        await checkAdminAuth();
 
 
-            await supabaseClient.auth.signOut();
+    if (!authenticated) {
 
-
-            localStorage.removeItem(
-                "adminLoggedIn"
-            );
-
-            localStorage.removeItem(
-                "adminEmail"
-            );
-
-            sessionStorage.removeItem(
-                "adminLoggedIn"
-            );
-
-            sessionStorage.removeItem(
-                "adminEmail"
-            );
-
-
-            window.location.href =
-                "login.html";
-
-        }
-    );
-
-
-    /* =========================================================
-       INITIALIZE
-    ========================================================= */
-
-    async function initializeAdmin() {
-
-        const authenticated =
-            await checkAdminAuth();
-
-
-        if (!authenticated) {
-            return;
-        }
-
-
-        updateLanguage();
-
-        await loadChannels();
-
+        return;
     }
 
 
-    initializeAdmin();
+    updateLanguage();
+
+    await loadChannels();
+
+    updateUrlHelp();
+
+}
+
+
+initializeAdmin();
 
 </script>
 
